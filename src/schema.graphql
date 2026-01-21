@@ -1,0 +1,13 @@
+type Query {
+  testPrompt(prompt: String!, modelA: String!, modelB: String!): PromptTestResult!
+}
+
+type PromptTestResult {
+  modelAResponse: ModelResponse!
+  modelBResponse: ModelResponse!
+}
+
+type ModelResponse {
+  content: String!
+  model: String!
+}
