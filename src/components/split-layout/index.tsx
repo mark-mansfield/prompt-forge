@@ -40,6 +40,11 @@ export function SplitLayout() {
   const [prompt, setPrompt] = useState('');
   const [modelAResponse, setModelAResponse] = useState('');
   const [modelBResponse, setModelBResponse] = useState('');
+  const [winner, setWinner] = useState<'llama' | 'qwen' | null>(null);
+
+  function handleWinner(model) {
+    setWinner(model);
+  }
   const [isLoading, setIsLoading] = useState(false);
   const modelAIndexRef = useRef(0);
   const modelBIndexRef = useRef(0);
@@ -156,7 +161,8 @@ export function SplitLayout() {
         <section className="flex-1 grid grid-cols-2 min-h-0">
           {/* Model A */}
           <div className="border-r border-slate-700 flex flex-col">
-            <div className="p-3 border-b border-slate-700">
+            <div className="p-3 border-b border-slate-700 flex items-center gap-2">
+              <span className="w-2 h-2 bg-green-400 rounded-full"></span>
               <h3 className="text-sm font-medium">Model A</h3>
             </div>
             <div className="flex-1 p-4 overflow-y-auto text-sm text-slate-300 whitespace-pre-wrap">
@@ -164,11 +170,18 @@ export function SplitLayout() {
                 <span className="text-slate-500">Response will appear here...</span>
               )}
             </div>
+            <button
+              onClick={() => handleWinner('llama')}
+              className="p-4 font-bold text-lg w-full transition-all duration-200 bg-white/10 hover:bg-white/20 border border-white/20"
+            >
+              {winner === 'llama' ? '👑 WINNER' : 'Make llama Winner'}
+            </button>
           </div>
 
           {/* Model B */}
           <div className="flex flex-col">
-            <div className="p-3 border-b border-slate-700">
+            <div className="p-3 border-b border-slate-700 flex items-center gap-2">
+              <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
               <h3 className="text-sm font-medium">Model B</h3>
             </div>
             <div className="flex-1 p-4 overflow-y-auto text-sm text-slate-300 whitespace-pre-wrap">
@@ -176,6 +189,12 @@ export function SplitLayout() {
                 <span className="text-slate-500">Response will appear here...</span>
               )}
             </div>
+            <button
+              onClick={() => handleWinner('qwen')}
+              className="p-4 font-bold text-lg w-full transition-all duration-200 bg-white/10 hover:bg-white/20 border border-white/20"
+            >
+              {winner === 'qwen' ? '👑 WINNER' : 'Make qwen Winner'}
+            </button>
           </div>
         </section>
       </main>
