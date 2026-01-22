@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FileText, Play, Trash2, Save, Sparkles, Target, MessageSquare, Crown } from 'lucide-react';
 
 type Prompt = {
@@ -69,6 +69,36 @@ export function SplitLayout() {
   const modelAIndexRef = useRef(0);
   const modelBIndexRef = useRef(0);
 
+  const startDelayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const checkDoneIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const modelAIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const modelBIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  function cleanupTimers() {
+    if (startDelayTimeoutRef.current !== null) {
+      clearTimeout(startDelayTimeoutRef.current);
+      startDelayTimeoutRef.current = null;
+    }
+    if (checkDoneIntervalRef.current !== null) {
+      clearInterval(checkDoneIntervalRef.current);
+      checkDoneIntervalRef.current = null;
+    }
+    if (modelAIntervalRef.current !== null) {
+      clearInterval(modelAIntervalRef.current);
+      modelAIntervalRef.current = null;
+    }
+    if (modelBIntervalRef.current !== null) {
+      clearInterval(modelBIntervalRef.current);
+      modelBIntervalRef.current = null;
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      cleanupTimers();
+    };
+  }, []);
+
   const typewriterEffect = (
     fullText: string,
     indexRef: React.MutableRefObject<number>,
@@ -86,35 +116,46 @@ export function SplitLayout() {
     return interval;
   };
 
-  console.log('isLoading', isLoading);
   // TODO use relay to test the prompt
   const handleTestPrompt = () => {
     if (!instructions.trim() || isLoading) return;
 
+    cleanupTimers();
     setIsLoading(true);
     setModelAResponse('');
     setModelBResponse('');
     modelAIndexRef.current = 0;
     modelBIndexRef.current = 0;
 
-    setTimeout(() => {
-      typewriterEffect(MOCK_RESPONSES.modelA, modelAIndexRef, setModelAResponse, 12);
-      typewriterEffect(MOCK_RESPONSES.modelB, modelBIndexRef, setModelBResponse, 18);
+    startDelayTimeoutRef.current = setTimeout(() => {
+      modelAIntervalRef.current = typewriterEffect(
+        MOCK_RESPONSES.modelA,
+        modelAIndexRef,
+        setModelAResponse,
+        12
+      );
+      modelBIntervalRef.current = typewriterEffect(
+        MOCK_RESPONSES.modelB,
+        modelBIndexRef,
+        setModelBResponse,
+        18
+      );
 
-      const checkDone = setInterval(() => {
+      checkDoneIntervalRef.current = setInterval(() => {
         if (
           modelAIndexRef.current >= MOCK_RESPONSES.modelA.length &&
           modelBIndexRef.current >= MOCK_RESPONSES.modelB.length
         ) {
           setIsLoading(false);
           setCanSave(true);
-          clearInterval(checkDone);
+          cleanupTimers();
         }
       }, 100);
     }, 500);
   };
 
   const handleClear = () => {
+    cleanupTimers();
     setEditingId(null);
     setTitle('');
     setInstructions('');
