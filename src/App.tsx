@@ -1,5 +1,5 @@
-import { RelayEnvironmentProvider, useLazyLoadQuery, graphql } from 'react-relay';
-import { relayEnvironment } from './relay/environment';
+import { useLazyLoadQuery, graphql } from 'react-relay';
+
 import { useState } from 'react';
 import { PasswordGate } from './components/password-gate';
 import { SplitLayout } from './components/split-layout';
@@ -31,9 +31,7 @@ function App() {
 
   console.log('prompt', TEST_PROMPT, 'response', data);
   return (
-    <RelayEnvironmentProvider environment={relayEnvironment}>
-      <>{authorized ? <SplitLayout /> : <PasswordGate onAuthorize={() => setAuthorized(true)} />}</>
-    </RelayEnvironmentProvider>
+    <>{authorized ? <SplitLayout /> : <PasswordGate onAuthorize={() => setAuthorized(true)} />}</>
   );
 }
 
