@@ -5,7 +5,6 @@ import { WinnerButton } from '../winner-button';
 import { PromptEditor } from '../prompt-editor';
 import { typewriterEffect } from '../../utils/typewriter';
 import type { Prompt } from './types';
-
 // TODO remove this after we implemnt the actual model respones
 const MOCK_RESPONSES = {
   modelA: `Subject: Transform Your AI Workflow with PromptForge
@@ -66,7 +65,6 @@ export function Layout() {
   const [isLoading, setIsLoading] = useState(false);
   const modelAIndexRef = useRef(0);
   const modelBIndexRef = useRef(0);
-
   const startDelayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const checkDoneIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const modelAIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
