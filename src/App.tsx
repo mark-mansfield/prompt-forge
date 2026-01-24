@@ -2,7 +2,7 @@ import { useLazyLoadQuery, graphql } from 'react-relay';
 
 import { useState } from 'react';
 import { PasswordGate } from './components/password-gate';
-import { SplitLayout } from './components/split-layout';
+import { Layout } from './components/layout';
 
 const TEST_PROMPT = 'test';
 const AppPromptTestQuery = graphql`
@@ -30,9 +30,7 @@ function App() {
   });
 
   console.log('prompt', TEST_PROMPT, 'response', data);
-  return (
-    <>{authorized ? <SplitLayout /> : <PasswordGate onAuthorize={() => setAuthorized(true)} />}</>
-  );
+  return <>{authorized ? <Layout /> : <PasswordGate onAuthorize={() => setAuthorized(true)} />}</>;
 }
 
 export default App;
