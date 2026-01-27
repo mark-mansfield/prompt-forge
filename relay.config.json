@@ -2,6 +2,10 @@
   "src": "./src",
   "language": "typescript",
   "schema": "./src/schema.graphql",
+  "schemaConfig": {
+    "nodeInterfaceIdField": "nodeId",
+    "nodeInterfaceIdVariableName": "nodeId"
+  },
   "excludes": [
     "**/node_modules/**",
     "**/__mocks__/**",

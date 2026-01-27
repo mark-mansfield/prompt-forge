@@ -233,7 +233,7 @@ type Mutation {
 }
 
 interface Node {
-  id: ID!
+  nodeId: ID!
 }
 
 """Any type not handled by the type system"""
@@ -274,7 +274,7 @@ type Query {
   """Retrieve a record by its `ID`"""
   node(
     """The record's `ID`"""
-    id: ID!
+    nodeId: ID!
   ): Node
 
   """A pagable collection of type `saved_prompts`"""
@@ -388,7 +388,7 @@ input UUIDListFilter {
 
 type saved_prompts implements Node {
   """Globally Unique Record Identifier"""
-  id: ID!
+  nodeId: ID!
   id: UUID!
   title: String!
   instructions: String!
@@ -424,7 +424,7 @@ input saved_promptsFilter {
   winner: winner_modelFilter
   created_at: DatetimeFilter
   updated_at: DatetimeFilter
-  id: IDFilter
+  nodeId: IDFilter
 
   """
   Returns true only if all its inner filters are true, otherwise returns false

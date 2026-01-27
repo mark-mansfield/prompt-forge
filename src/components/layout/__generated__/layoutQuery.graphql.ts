@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<16382871c73fcd0c550eebb775804bf8>>
+ * @generated SignedSource<<4f8da33715272578ef9c858e8141432b>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,8 +16,9 @@ export type layoutQuery$data = {
     readonly edges: ReadonlyArray<{
       readonly node: {
         readonly icon: string;
-        readonly id: string;
+        readonly id: any;
         readonly instructions: string;
+        readonly nodeId: string;
         readonly title: string;
         readonly winner: winner_model | null | undefined;
       };
@@ -86,6 +87,13 @@ var v0 = [
                 "alias": null,
                 "args": null,
                 "kind": "ScalarField",
+                "name": "nodeId",
+                "storageKey": null
+              },
+              {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
                 "name": "id",
                 "storageKey": null
               },
@@ -145,16 +153,16 @@ return {
     "selections": (v0/*: any*/)
   },
   "params": {
-    "cacheID": "de035ff15e687d1d5decb33ca1ed7252",
+    "cacheID": "27cb6339cef7479af1c72c05a1d5576d",
     "id": null,
     "metadata": {},
     "name": "layoutQuery",
     "operationKind": "query",
-    "text": "query layoutQuery {\n  saved_promptsCollection(first: 50) {\n    pageInfo {\n      hasNextPage\n    }\n    edges {\n      node {\n        id\n        title\n        instructions\n        icon\n        winner\n      }\n    }\n  }\n}\n"
+    "text": "query layoutQuery {\n  saved_promptsCollection(first: 50) {\n    pageInfo {\n      hasNextPage\n    }\n    edges {\n      node {\n        nodeId\n        id\n        title\n        instructions\n        icon\n        winner\n      }\n    }\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "c8467d948d5b6783dc3b6370f7d7751d";
+(node as any).hash = "95f1cf46bc240d5197f1faa9f52688cc";
 
 export default node;

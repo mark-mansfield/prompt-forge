@@ -10,7 +10,7 @@
     "format": "prettier --write src/",
     "preview": "vite preview",
     "relay": "relay-compiler",
-    "get-schema": "node fetch-schema.js"
+    "get-schema": "node --env-file=.env ./scripts/fetch-schema.js"
   },
   "dependencies": {
     "react": "^19.2.0",

@@ -50,7 +50,8 @@ const LayoutQuery = graphql`
       }
       edges {
         node {
-          id # This was 'nodeId' (The Relay Global ID)
+          nodeId
+          id
           title
           instructions
           icon
