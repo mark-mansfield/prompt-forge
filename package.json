@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "format": "prettier --write src/",
     "preview": "vite preview",
-    "relay": "relay-compiler"
+    "relay": "relay-compiler",
+    "get-schema": "node fetch-schema.js"
   },
   "dependencies": {
     "react": "^19.2.0",
@@ -42,6 +43,7 @@
     "prettier": "^3.8.1",
     "prettier-eslint": "^16.4.2",
     "relay-compiler": "^20.1.1",
+    "sync-fetch": "^0.6.0",
     "tailwindcss": "^4.1.18",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.53.1",

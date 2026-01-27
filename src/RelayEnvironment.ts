@@ -6,26 +6,56 @@ import {
   type RequestParameters,
   type Variables,
 } from 'relay-runtime';
-import type { AppPromptTestQuery$data } from './__generated__/AppPromptTestQuery.graphql';
 
 async function fetchQuery(params: RequestParameters, variables: Variables) {
-  console.log('📡 Mock fetchQuery:', params.name, variables);
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  if (!supabaseUrl) {
+    throw new Error('Missing VITE_SUPABASE_URL');
+  }
+  if (!supabaseAnonKey) {
+    throw new Error('Missing VITE_SUPABASE_ANON_KEY');
+  }
+  if (!params.text) {
+    throw new Error(`Relay request missing text for operation: ${params.name}`);
+  }
 
-  // Your existing mock data (works perfectly)
-  const mockData: AppPromptTestQuery$data = {
-    testPrompt: {
-      modelAResponse: {
-        content: "Mock Llama3.1: Here's your response.",
-        model: 'llama3.1-8b',
-      },
-      modelBResponse: {
-        content: "Mock Qwen2.5: Certainly, here's yours.",
-        model: 'qwen2.5-7b',
-      },
+  const response = await fetch(`${supabaseUrl}/graphql/v1`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: supabaseAnonKey,
+      Authorization: `Bearer ${supabaseAnonKey}`,
     },
-  };
+    body: JSON.stringify({
+      query: params.text,
+      variables,
+    }),
+  });
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => '');
+    throw new Error(
+      `GraphQL request failed (${response.status} ${response.statusText})${errorText ? `: ${errorText}` : ''}`
+    );
+  }
+  return response.json();
+  // console.log('📡 Mock fetchQuery:', params.name, variables);
 
-  return { data: mockData };
+  // // Your existing mock data (works perfectly)
+  // const mockData = {
+  //   testPrompt: {
+  //     modelAResponse: {
+  //       content: "Mock Llama3.1: Here's your response.",
+  //       model: 'llama3.1-8b',
+  //     },
+  //     modelBResponse: {
+  //       content: "Mock Qwen2.5: Certainly, here's yours.",
+  //       model: 'qwen2.5-7b',
+  //     },
+  //   },
+  // };
+
+  // return { data: mockData };
 }
 
 function createRelayEnvironment() {

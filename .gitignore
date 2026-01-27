@@ -15,6 +15,11 @@ dist-ssr
 # Vite dev cache (generated)
 .vite/
 
+# Environment variables
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
