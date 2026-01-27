@@ -5,6 +5,7 @@ import { WinnerButton } from '../winner-button';
 import { PromptEditor } from '../prompt-editor';
 import { typewriterEffect } from '../../utils/typewriter';
 import type { Prompt } from './types';
+import { graphql, useLazyLoadQuery } from 'react-relay';
 // TODO remove this after we implemnt the actual model respones
 const MOCK_RESPONSES = {
   modelA: `Subject: Transform Your AI Workflow with PromptForge
@@ -41,6 +42,26 @@ const MODIFIERS = {
   tone: 'Match professional tone. Confident, direct, persuasive.',
 };
 
+const LayoutQuery = graphql`
+  query layoutQuery {
+    saved_promptsCollection(first: 50) {
+      pageInfo {
+        hasNextPage
+      }
+      edges {
+        node {
+          nodeId
+          id
+          title
+          instructions
+          icon
+          winner
+        }
+      }
+    }
+  }
+`;
+
 export function Layout() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [title, setTitle] = useState<string>('');
@@ -50,6 +71,10 @@ export function Layout() {
   const [savedPrompts, setSavedPrompts] = useState<Prompt[]>(() =>
     JSON.parse(localStorage.getItem('savedPrompts') || '[]')
   );
+
+  const data = useLazyLoadQuery(LayoutQuery, {});
+
+  console.log('data', data);
 
   const [modelBResponse, setModelBResponse] = useState('');
   const [winner, setWinner] = useState<'llama' | 'qwen' | null>(null);
