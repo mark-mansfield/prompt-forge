@@ -6,6 +6,8 @@ import { PromptEditor } from '../prompt-editor';
 import { typewriterEffect } from '../../utils/typewriter';
 import type { Prompt } from './types';
 import { graphql, useLazyLoadQuery } from 'react-relay';
+import type { sidebar_prompts_fragment$key } from '../sidebar/__generated__/sidebar_prompts_fragment.graphql';
+import type { layoutQuery as LayoutQueryType } from './__generated__/layoutQuery.graphql';
 // TODO remove this after we implemnt the actual model respones
 const MOCK_RESPONSES = {
   modelA: `Subject: Transform Your AI Workflow with PromptForge
@@ -50,12 +52,7 @@ const LayoutQuery = graphql`
       }
       edges {
         node {
-          nodeId
-          id
-          title
-          instructions
-          icon
-          winner
+          ...sidebar_prompts_fragment
         }
       }
     }
@@ -72,7 +69,9 @@ export function Layout() {
     JSON.parse(localStorage.getItem('savedPrompts') || '[]')
   );
 
-  const data = useLazyLoadQuery(LayoutQuery, {});
+  const data = useLazyLoadQuery<LayoutQueryType>(LayoutQuery, {});
+  const nodes: sidebar_prompts_fragment$key =
+    data.saved_promptsCollection?.edges?.map((e) => e.node) ?? [];
 
   console.log('data', data);
 
@@ -202,7 +201,7 @@ export function Layout() {
   return (
     <div className="h-screen flex bg-slate-900 text-white">
       {/* Left Sidebar - Saved Prompts */}
-      <Sidebar savedPrompts={savedPrompts} handleLoadPrompt={handleLoadPrompt} />
+      <Sidebar promptNodesRef={nodes} handleLoadPrompt={handleLoadPrompt} />
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col">
