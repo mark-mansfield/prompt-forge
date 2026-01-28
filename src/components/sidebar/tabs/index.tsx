@@ -15,7 +15,7 @@ export const Tabs = ({ activeTabId }: { activeTabId: string }): React.ReactNode 
   const environment = useRelayEnvironment();
 
   return (
-    <div className="border-b border-slate-700 pt-12 flex gap-2 ml-2">
+    <div className="border-b border-slate-700 pt-8 flex gap-2 ml-4">
       {TABS.map((tab) => (
         <button
           key={tab.id}

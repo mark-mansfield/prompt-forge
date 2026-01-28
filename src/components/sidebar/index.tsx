@@ -35,13 +35,15 @@ export function Sidebar({ promptNodesRef, handleLoadPrompt }: Props) {
     activeTabId === 'all' ? prompts : prompts.filter((p) => p.winner === activeTabId);
 
   return (
-    <aside className="w-68 border-r border-slate-700 flex flex-col">
-      <div className="p-4 flex items-center gap-2 border-b border-slate-700">
-        <AnvilIcon size={24} />
-        <h1 className="text-2xl font-bold">PromptForge</h1>
+    <aside className="w-68 border-r border-slate-700 flex flex-col overflow-y-auto">
+      <div className="sticky top-0 z-50 bg-slate-900">
+        <div className="p-4 flex items-center gap-2 border-b border-slate-700">
+          <AnvilIcon size={24} />
+          <h1 className="text-2xl font-bold">PromptForge</h1>
+        </div>
+        <Tabs activeTabId={activeTabId} />
       </div>
-      <Tabs activeTabId={activeTabId} />
-      <div className="p-4">
+      <div className="p-4 mt-4">
         <h2 className="text-sm font-medium text-slate-400 mb-3">Recent prompts</h2>
         <ul className="space-y-2">
           {visiblePrompts.map((p) => (
