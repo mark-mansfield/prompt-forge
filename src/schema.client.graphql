@@ -1,0 +1,11 @@
+extend type Query {
+  # stored in the Relay store via commitLocalUpdate
+  activeTabIdBacking: String
+
+  # queried by UI; computed client-side by a Relay Resolver
+  activeTabId: String!
+    @relay_resolver(
+      fragment_name: "ActiveTabIdResolverFragment"
+      import_path: "relay/resolvers/ActiveTabIdResolver"
+    )
+}

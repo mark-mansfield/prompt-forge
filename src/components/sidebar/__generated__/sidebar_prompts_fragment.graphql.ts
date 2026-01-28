@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<86c9cdd4b3a5d266e46f5fe78dbe8235>>
+ * @generated SignedSource<<80b721ffb2a585cc6fd8a096f3ca5029>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -16,7 +16,7 @@ export type sidebar_prompts_fragment$data = ReadonlyArray<{
   readonly id: any;
   readonly instructions: string;
   readonly title: string;
-  readonly winner: winner_model | null | undefined;
+  readonly winner: winner_model;
   readonly " $fragmentType": "sidebar_prompts_fragment";
 }>;
 export type sidebar_prompts_fragment$key = ReadonlyArray<{

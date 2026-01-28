@@ -1,6 +1,6 @@
 import { Save, Play, Trash2, Sparkles, Target, MessageSquare, CircleX } from 'lucide-react';
 import { PromptEditorHeader } from './header';
-import type { Prompt } from '../layout/types';
+import type { DraftPrompt } from '../layout/types';
 
 export const PromptEditor = ({
   prompt,
@@ -13,7 +13,7 @@ export const PromptEditor = ({
   setInstructions,
   applyModifier,
 }: {
-  prompt: Prompt;
+  prompt: DraftPrompt;
   handleTestPrompt: () => void;
   handleClear: () => void;
   isLoading: boolean;
