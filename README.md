@@ -55,7 +55,7 @@ src/
 
 ### Relay → Domain adapters
 
-Relay-generated types are intentionally *forward compatible* (notably enums include `"%future added value"`),
+Relay-generated types are intentionally _forward compatible_ (notably enums include `"%future added value"`),
 so they won’t perfectly match strict UI/domain models. This project uses an explicit adapter boundary:
 
 - `src/domain/promptAdapter.ts`
@@ -63,6 +63,37 @@ so they won’t perfectly match strict UI/domain models. This project uses an ex
 Components convert Relay fragment data into domain types via this adapter. The policy is **fail fast** on
 schema drift: if the backend adds a new enum value, the adapter throws with a message telling you where
 to update.
+
+### Relay UI state (Active Tab)
+
+This app keeps the sidebar active tab in the **Relay store** (client-side) using a **Relay Resolver**.
+This lets multiple sidebar children react to tab changes without prop-drilling local React state everywhere.
+
+#### Files
+
+- **Client schema extension**: `src/schema.client.graphql`
+  - `activeTabIdBacking: String` (stored in Relay store via `commitLocalUpdate`)
+  - `activeTabId: String!` (computed by a Relay Resolver)
+- **Relay compiler config**: `relay.config.json`
+  - Includes the extension file:
+    - `"schemaExtensions": ["./src/schema.client.graphql"]`
+- **Resolver implementation**: `src/relay/resolvers/ActiveTabIdResolver.ts`
+  - Reads `activeTabIdBacking` from a fragment on `Query`
+  - Returns `'all'` when backing is `null`
+- **Write helper**: `src/relay/ui-state.ts`
+  - Uses `commitLocalUpdate` to set the root backing field:
+    - `store.getRoot().setValue(tabId, 'activeTabIdBacking')`
+
+#### How to use in UI
+
+- **Read**: select `activeTabId` in your Relay queries
+- **Write**: on tab click, call the helper that updates `activeTabIdBacking`
+
+#### Gotchas
+
+- If Relay says `Query has no field activeTabIdBacking`, make sure `src/schema.client.graphql` is **saved to disk**
+  and rerun `yarn relay`.
+- Do not use `@client` in Relay queries; the Relay compiler will fail with "Unknown directive 'client'".
 
 ### Code Formatting
 

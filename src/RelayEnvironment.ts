@@ -7,6 +7,8 @@ import {
   type Variables,
 } from 'relay-runtime';
 
+import { setActiveTabId } from './relay/ui-state';
+
 async function fetchQuery(params: RequestParameters, variables: Variables) {
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -59,10 +61,12 @@ async function fetchQuery(params: RequestParameters, variables: Variables) {
 }
 
 function createRelayEnvironment() {
-  return new Environment({
+  const environment = new Environment({
     network: Network.create(fetchQuery),
     store: new Store(new RecordSource()),
   });
+  setActiveTabId(environment, 'all');
+  return environment;
 }
 
 export const RelayEnvironment = createRelayEnvironment();

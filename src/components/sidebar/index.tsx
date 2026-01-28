@@ -1,9 +1,11 @@
 import { AnvilIcon } from 'lucide-react';
 import type { Prompt } from '../layout/types';
-import { useFragment, graphql } from 'react-relay';
+import { useFragment, graphql, useLazyLoadQuery } from 'react-relay';
 import type { sidebar_prompts_fragment$key } from './__generated__/sidebar_prompts_fragment.graphql';
+import type { sidebarActiveTabQuery as SidebarActiveTabQueryType } from './__generated__/sidebarActiveTabQuery.graphql';
 import { Tabs } from './tabs';
 import { promptFromSidebarNode } from '../../domain/promptAdapter';
+
 const sidebarPromptsFragment = graphql`
   fragment sidebar_prompts_fragment on saved_prompts @relay(plural: true) {
     id
@@ -14,13 +16,23 @@ const sidebarPromptsFragment = graphql`
   }
 `;
 
+const sidebarActiveTabQuery = graphql`
+  query sidebarActiveTabQuery {
+    activeTabId
+  }
+`;
+
 type Props = {
   promptNodesRef: sidebar_prompts_fragment$key;
   handleLoadPrompt: (prompt: Prompt) => void;
 };
 
 export function Sidebar({ promptNodesRef, handleLoadPrompt }: Props) {
+  const { activeTabId } = useLazyLoadQuery<SidebarActiveTabQueryType>(sidebarActiveTabQuery, {});
   const prompts = useFragment(sidebarPromptsFragment, promptNodesRef);
+
+  const visiblePrompts =
+    activeTabId === 'all' ? prompts : prompts.filter((p) => p.winner === activeTabId);
 
   return (
     <aside className="w-68 border-r border-slate-700 flex flex-col">
@@ -28,11 +40,11 @@ export function Sidebar({ promptNodesRef, handleLoadPrompt }: Props) {
         <AnvilIcon size={24} />
         <h1 className="text-2xl font-bold">PromptForge</h1>
       </div>
-      <Tabs />
+      <Tabs activeTabId={activeTabId} />
       <div className="p-4">
         <h2 className="text-sm font-medium text-slate-400 mb-3">Recent prompts</h2>
         <ul className="space-y-2">
-          {prompts.map((p) => (
+          {visiblePrompts.map((p) => (
             <li key={p.id} className="text-sm text-slate-300 hover:text-white cursor-pointer">
               <button
                 className="w-full flex gap-1 text-left p-2 rounded-md hover:bg-blue-500/30"
