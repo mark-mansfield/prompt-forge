@@ -53,6 +53,17 @@ src/
 
 ## Development
 
+### Relay → Domain adapters
+
+Relay-generated types are intentionally *forward compatible* (notably enums include `"%future added value"`),
+so they won’t perfectly match strict UI/domain models. This project uses an explicit adapter boundary:
+
+- `src/domain/promptAdapter.ts`
+
+Components convert Relay fragment data into domain types via this adapter. The policy is **fail fast** on
+schema drift: if the backend adds a new enum value, the adapter throws with a message telling you where
+to update.
+
 ### Code Formatting
 
 Run Prettier to format all files:

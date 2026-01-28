@@ -233,6 +233,7 @@ type Mutation {
 }
 
 interface Node {
+  """Retrieves a record by `ID`"""
   nodeId: ID!
 }
 
@@ -393,7 +394,7 @@ type saved_prompts implements Node {
   title: String!
   instructions: String!
   icon: String!
-  winner: winner_model
+  winner: winner_model!
   created_at: Datetime!
   updated_at: Datetime!
 }

@@ -3,6 +3,7 @@ import type { Prompt } from '../layout/types';
 import { useFragment, graphql } from 'react-relay';
 import type { sidebar_prompts_fragment$key } from './__generated__/sidebar_prompts_fragment.graphql';
 import { Tabs } from './tabs';
+import { promptFromSidebarNode } from '../../domain/promptAdapter';
 const sidebarPromptsFragment = graphql`
   fragment sidebar_prompts_fragment on saved_prompts @relay(plural: true) {
     id
@@ -35,7 +36,7 @@ export function Sidebar({ promptNodesRef, handleLoadPrompt }: Props) {
             <li key={p.id} className="text-sm text-slate-300 hover:text-white cursor-pointer">
               <button
                 className="w-full flex gap-1 text-left p-2 rounded-md hover:bg-blue-500/30"
-                onClick={() => handleLoadPrompt(p)}
+                onClick={() => handleLoadPrompt(promptFromSidebarNode(p))}
               >
                 <span className="w-4 h-4">{p.icon}</span>
                 <span className="text-sm">{p.title}</span>

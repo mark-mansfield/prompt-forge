@@ -4,7 +4,7 @@ import { ModelResponse } from '../model-response';
 import { WinnerButton } from '../winner-button';
 import { PromptEditor } from '../prompt-editor';
 import { typewriterEffect } from '../../utils/typewriter';
-import type { Prompt } from './types';
+import type { DraftPrompt, Prompt } from './types';
 import { graphql, useLazyLoadQuery } from 'react-relay';
 import type { sidebar_prompts_fragment$key } from '../sidebar/__generated__/sidebar_prompts_fragment.graphql';
 import type { layoutQuery as LayoutQueryType } from './__generated__/layoutQuery.graphql';
@@ -65,7 +65,7 @@ export function Layout() {
   const [canSave, setCanSave] = useState<boolean>(false);
   const [instructions, setInstructions] = useState<string>('');
   const [modelAResponse, setModelAResponse] = useState<string>('');
-  const [savedPrompts, setSavedPrompts] = useState<Prompt[]>(() =>
+  const [savedPrompts, setSavedPrompts] = useState<DraftPrompt[]>(() =>
     JSON.parse(localStorage.getItem('savedPrompts') || '[]')
   );
 
