@@ -1,1 +1,18 @@
 @import 'tailwindcss';
+
+@layer base {
+  :root {
+    --toast-bg: #ffffff;
+    --toast-border: #e2e8f0;
+    --toast-text: #0f172a;
+    --toast-muted: #64748b;
+    --toast-radius: 0.5rem;
+  }
+
+  .dark {
+    --toast-bg: #0f172a;
+    --toast-border: #1e293b;
+    --toast-text: #f8fafc;
+    --toast-muted: #94a3b8;
+  }
+}

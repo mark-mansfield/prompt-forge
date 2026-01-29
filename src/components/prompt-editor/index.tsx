@@ -1,4 +1,5 @@
 import { Save, Play, Trash2, Sparkles, Target, MessageSquare, CircleX } from 'lucide-react';
+import { toast } from 'sonner';
 import { PromptEditorHeader } from './header';
 import type { DraftPrompt } from '../layout/types';
 
@@ -40,7 +41,9 @@ export const PromptEditor = ({
             {isLoading ? 'Testing...' : 'Run'}
           </button>
           <button
-            onClick={handleClear}
+            onClick={() => {
+              handleClear();
+            }}
             className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm flex items-center gap-1"
           >
             <CircleX className="w-3 h-3" />
