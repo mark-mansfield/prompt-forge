@@ -5,10 +5,14 @@ import { WinnerButton } from '../winner-button';
 import { PromptEditor } from '../prompt-editor';
 import { typewriterEffect } from '../../utils/typewriter';
 import type { Prompt } from './types';
-import { commitMutation, graphql, useLazyLoadQuery, useRelayEnvironment } from 'react-relay';
+import { graphql, useLazyLoadQuery, useMutation } from 'react-relay';
 import { useSavedPromptsConnectionUpdaters } from '../../relay/hooks/useSavedPromptsConnectionUpdaters';
 import type { sidebar_prompts_fragment$key } from '../sidebar/__generated__/sidebar_prompts_fragment.graphql';
 import type { layoutQuery as LayoutQueryType } from './__generated__/layoutQuery.graphql';
+import type { layoutSavePromptMutation } from './__generated__/layoutSavePromptMutation.graphql';
+import type { layoutUpdatePromptMutation } from './__generated__/layoutUpdatePromptMutation.graphql';
+import type { layoutDeletePromptMutation } from './__generated__/layoutDeletePromptMutation.graphql';
+import { toast } from 'sonner';
 // TODO remove this after we implemnt the actual model respones
 const MOCK_RESPONSES = {
   modelA: `Subject: Transform Your AI Workflow with PromptForge
@@ -100,7 +104,6 @@ export const DeletePromptMutation = graphql`
 `;
 
 export function Layout() {
-  const environment = useRelayEnvironment();
   const {
     addPromptToSidebarConnection,
     updatePromptInSidebarConnection,
@@ -109,9 +112,13 @@ export function Layout() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [title, setTitle] = useState<string>('');
-  const [canSave, setCanSave] = useState<boolean>(false);
   const [instructions, setInstructions] = useState<string>('');
   const [modelAResponse, setModelAResponse] = useState<string>('');
+  const [lastSaved, setLastSaved] = useState<{
+    title: string;
+    instructions: string;
+    winner: 'llama' | 'qwen' | null;
+  } | null>(null);
 
   const data = useLazyLoadQuery<LayoutQueryType>(LayoutQuery, {});
   const nodes: sidebar_prompts_fragment$key =
@@ -119,6 +126,25 @@ export function Layout() {
 
   const [modelBResponse, setModelBResponse] = useState('');
   const [winner, setWinner] = useState<'llama' | 'qwen' | null>(null);
+
+  const [commitSavePrompt, isSaveInFlight] =
+    useMutation<layoutSavePromptMutation>(SavePromptMutation);
+  const [commitUpdatePrompt, isUpdateInFlight] =
+    useMutation<layoutUpdatePromptMutation>(UpdatePromptMutation);
+  const [commitDeletePrompt, isDeleteInFlight] =
+    useMutation<layoutDeletePromptMutation>(DeletePromptMutation);
+
+  const isMutating = isSaveInFlight || isUpdateInFlight || isDeleteInFlight;
+  const isValid = Boolean(title.trim()) && Boolean(instructions.trim());
+  const isDirty =
+    lastSaved === null
+      ? Boolean(title.trim() || instructions.trim() || winner !== null)
+      : title !== lastSaved.title ||
+        instructions !== lastSaved.instructions ||
+        winner !== lastSaved.winner;
+
+  const canSavePrompt = isValid && isDirty && winner !== null && !isMutating;
+  const canDeletePrompt = Boolean(editingId) && !isMutating;
 
   function applyModifier(type: keyof typeof MODIFIERS) {
     setInstructions((prev) => prev + '\n\n' + MODIFIERS[type]);
@@ -192,7 +218,6 @@ export function Layout() {
           modelBIndexRef.current >= MOCK_RESPONSES.modelB.length
         ) {
           setIsLoading(false);
-          setCanSave(true);
           cleanupTimers();
         }
       }, 100);
@@ -210,20 +235,18 @@ export function Layout() {
     modelBIndexRef.current = 0;
     setIsLoading(false);
     setWinner(null);
-    setCanSave(false);
-    setEditingId(null);
+    setLastSaved(null);
   };
 
   function handleSave() {
-    if (!title.trim()) return;
-    if (!instructions.trim()) return;
+    if (!isValid) return;
     if (winner === null) return;
+    if (isMutating) return;
 
     const icon = winner === 'llama' ? '🦙' : '🐍';
 
     if (editingId) {
-      commitMutation(environment, {
-        mutation: UpdatePromptMutation,
+      commitUpdatePrompt({
         variables: {
           filter: { id: { eq: editingId } },
           set: {
@@ -242,17 +265,18 @@ export function Layout() {
           updatePromptInSidebarConnection(store, editingId, { title, instructions, icon, winner });
         },
         onCompleted: () => {
-          setCanSave(false);
+          setLastSaved({ title, instructions, winner });
+          toast.success('Prompt updated');
         },
         onError: (err) => {
           console.error('Failed to update prompt:', err);
+          toast.error('Failed to update prompt');
         },
       });
       return;
     }
 
-    commitMutation(environment, {
-      mutation: SavePromptMutation,
+    commitSavePrompt({
       variables: {
         object: {
           title,
@@ -269,20 +293,28 @@ export function Layout() {
       updater: (store) => {
         addPromptToSidebarConnection(store);
       },
-      onCompleted: () => {
-        setCanSave(false);
+      onCompleted: (resp) => {
+        const insertedId = resp.insertIntosaved_promptsCollection?.records?.[0]?.id;
+        if (insertedId) {
+          setEditingId(String(insertedId));
+          setLastSaved({ title, instructions, winner });
+        } else {
+          toast.error('Saved, but could not determine prompt id');
+        }
+        toast.success('Prompt saved');
       },
       onError: (err) => {
         console.error('Failed to save prompt:', err);
+        toast.error('Failed to save prompt');
       },
     });
   }
 
   function handleDeletePrompt() {
     if (!editingId) return;
+    if (isMutating) return;
 
-    commitMutation(environment, {
-      mutation: DeletePromptMutation,
+    commitDeletePrompt({
       variables: { filter: { id: { eq: editingId } } },
       optimisticUpdater: (store) => {
         removePromptFromSidebarConnection(store, editingId);
@@ -292,9 +324,11 @@ export function Layout() {
       },
       onCompleted: () => {
         handleClear();
+        toast.success('Prompt deleted');
       },
       onError: (err) => {
         console.error('Failed to delete prompt:', err);
+        toast.error('Failed to delete prompt');
       },
     });
   }
@@ -304,13 +338,14 @@ export function Layout() {
     setTitle(prompt.title);
     setInstructions(prompt.instructions);
     setWinner(prompt.winner);
+    setLastSaved({ title: prompt.title, instructions: prompt.instructions, winner: prompt.winner });
     setModelAResponse('');
     setModelBResponse('');
     modelAIndexRef.current = 0;
     modelBIndexRef.current = 0;
     setIsLoading(false);
   }
-
+  console.log('editingId', editingId);
   return (
     <div className="h-screen flex bg-slate-900 text-white">
       {/* Left Sidebar - Saved Prompts */}
@@ -330,7 +365,8 @@ export function Layout() {
           handleTestPrompt={handleTestPrompt}
           handleClear={handleClear}
           applyModifier={applyModifier}
-          canSave={canSave && winner !== null}
+          canSave={canSavePrompt}
+          canDelete={canDeletePrompt}
           handleSave={handleSave}
           handleDelete={handleDeletePrompt}
           setTitle={setTitle}

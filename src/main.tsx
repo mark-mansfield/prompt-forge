@@ -11,7 +11,6 @@ createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <App />
       <Toaster
-        duration={10000000}
         closeButton
         theme="dark"
         className="group" // Useful for targeting nested elements
