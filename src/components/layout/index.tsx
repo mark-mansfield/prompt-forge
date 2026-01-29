@@ -4,8 +4,9 @@ import { ModelResponse } from '../model-response';
 import { WinnerButton } from '../winner-button';
 import { PromptEditor } from '../prompt-editor';
 import { typewriterEffect } from '../../utils/typewriter';
-import type { DraftPrompt, Prompt } from './types';
-import { graphql, useLazyLoadQuery } from 'react-relay';
+import type { Prompt } from './types';
+import { commitMutation, graphql, useLazyLoadQuery, useRelayEnvironment } from 'react-relay';
+import { ConnectionHandler } from 'relay-runtime';
 import type { sidebar_prompts_fragment$key } from '../sidebar/__generated__/sidebar_prompts_fragment.graphql';
 import type { layoutQuery as LayoutQueryType } from './__generated__/layoutQuery.graphql';
 // TODO remove this after we implemnt the actual model respones
@@ -46,7 +47,7 @@ const MODIFIERS = {
 
 const LayoutQuery = graphql`
   query layoutQuery {
-    saved_promptsCollection(first: 50) {
+    saved_promptsCollection(first: 50) @connection(key: "Layout__saved_promptsCollection") {
       pageInfo {
         hasNextPage
       }
@@ -59,21 +60,31 @@ const LayoutQuery = graphql`
   }
 `;
 
+export const SavePromptMutation = graphql`
+  mutation layoutSavePromptMutation($object: saved_promptsInsertInput!) {
+    insertIntosaved_promptsCollection(objects: [$object]) {
+      records {
+        id
+        title
+        icon
+        instructions
+        winner
+      }
+    }
+  }
+`;
+
 export function Layout() {
+  const environment = useRelayEnvironment();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [title, setTitle] = useState<string>('');
   const [canSave, setCanSave] = useState<boolean>(false);
   const [instructions, setInstructions] = useState<string>('');
   const [modelAResponse, setModelAResponse] = useState<string>('');
-  const [savedPrompts, setSavedPrompts] = useState<DraftPrompt[]>(() =>
-    JSON.parse(localStorage.getItem('savedPrompts') || '[]')
-  );
 
   const data = useLazyLoadQuery<LayoutQueryType>(LayoutQuery, {});
   const nodes: sidebar_prompts_fragment$key =
     data.saved_promptsCollection?.edges?.map((e) => e.node) ?? [];
-
-  console.log('data', data);
 
   const [modelBResponse, setModelBResponse] = useState('');
   const [winner, setWinner] = useState<'llama' | 'qwen' | null>(null);
@@ -173,16 +184,48 @@ export function Layout() {
 
   // TODO use relay to save the prompt
   function handleSave() {
+    if (editingId) {
+      // We only support creating new prompts for now.
+      // Updating an existing saved prompt should use `updatesaved_promptsCollection`.
+      console.warn('Saving edits is not implemented yet (editingId present).');
+      return;
+    }
+    if (!title.trim()) return;
+    if (!instructions.trim()) return;
+
     const icon = winner !== null && winner === 'llama' ? '🦙' : '🐍';
 
-    const updated = editingId
-      ? savedPrompts.map((p) =>
-          p.id === editingId ? { ...p, title, instructions, icon, winner } : p
-        )
-      : [...savedPrompts, { id: crypto.randomUUID(), title, instructions, icon, winner }];
+    commitMutation(environment, {
+      mutation: SavePromptMutation,
+      variables: {
+        object: {
+          title,
+          instructions,
+          icon,
+          winner,
+          // NOTE: we intentionally do NOT send id/nodeId/created_at/updated_at
+          // since those are Supabase-managed (db defaults/triggers).
+        },
+      },
+      updater: (store) => {
+        const payload = store.getRootField('insertIntosaved_promptsCollection');
+        const inserted = payload?.getLinkedRecords('records')?.[0];
+        if (!inserted) return;
 
-    localStorage.setItem('savedPrompts', JSON.stringify(updated));
-    setSavedPrompts(updated);
+        const root = store.getRoot();
+        const connection = ConnectionHandler.getConnection(root, 'Layout__saved_promptsCollection');
+        if (!connection) return;
+
+        const edge = ConnectionHandler.createEdge(store, connection, inserted, 'saved_promptsEdge');
+        ConnectionHandler.insertEdgeBefore(connection, edge);
+      },
+      onCompleted: () => {
+        setCanSave(false);
+      },
+      onError: (err) => {
+        console.error('Failed to save prompt:', err);
+      },
+    });
   }
 
   // get the prompt from the relay cache
@@ -217,7 +260,7 @@ export function Layout() {
           handleTestPrompt={handleTestPrompt}
           handleClear={handleClear}
           applyModifier={applyModifier}
-          canSave={canSave}
+          canSave={canSave && winner !== null}
           handleSave={handleSave}
           setTitle={setTitle}
           setInstructions={setInstructions}

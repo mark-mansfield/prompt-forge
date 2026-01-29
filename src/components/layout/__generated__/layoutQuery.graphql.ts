@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<2e9a49c33d02af329920256dc8356313>>
+ * @generated SignedSource<<8c05bb7ad5bc21243ffb8d3ce4a82614>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -29,14 +29,7 @@ export type layoutQuery = {
 };
 
 const node: ConcreteRequest = (function(){
-var v0 = [
-  {
-    "kind": "Literal",
-    "name": "first",
-    "value": 50
-  }
-],
-v1 = {
+var v0 = {
   "alias": null,
   "args": null,
   "concreteType": "PageInfo",
@@ -50,10 +43,38 @@ v1 = {
       "kind": "ScalarField",
       "name": "hasNextPage",
       "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "endCursor",
+      "storageKey": null
     }
   ],
   "storageKey": null
-};
+},
+v1 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "__typename",
+  "storageKey": null
+},
+v2 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "cursor",
+  "storageKey": null
+},
+v3 = [
+  {
+    "kind": "Literal",
+    "name": "first",
+    "value": 50
+  }
+];
 return {
   "fragment": {
     "argumentDefinitions": [],
@@ -62,14 +83,14 @@ return {
     "name": "layoutQuery",
     "selections": [
       {
-        "alias": null,
-        "args": (v0/*: any*/),
+        "alias": "saved_promptsCollection",
+        "args": null,
         "concreteType": "saved_promptsConnection",
         "kind": "LinkedField",
-        "name": "saved_promptsCollection",
+        "name": "__Layout__saved_promptsCollection_connection",
         "plural": false,
         "selections": [
-          (v1/*: any*/),
+          (v0/*: any*/),
           {
             "alias": null,
             "args": null,
@@ -90,15 +111,17 @@ return {
                     "args": null,
                     "kind": "FragmentSpread",
                     "name": "sidebar_prompts_fragment"
-                  }
+                  },
+                  (v1/*: any*/)
                 ],
                 "storageKey": null
-              }
+              },
+              (v2/*: any*/)
             ],
             "storageKey": null
           }
         ],
-        "storageKey": "saved_promptsCollection(first:50)"
+        "storageKey": null
       }
     ],
     "type": "Query",
@@ -112,13 +135,13 @@ return {
     "selections": [
       {
         "alias": null,
-        "args": (v0/*: any*/),
+        "args": (v3/*: any*/),
         "concreteType": "saved_promptsConnection",
         "kind": "LinkedField",
         "name": "saved_promptsCollection",
         "plural": false,
         "selections": [
-          (v1/*: any*/),
+          (v0/*: any*/),
           {
             "alias": null,
             "args": null,
@@ -176,29 +199,51 @@ return {
                     "kind": "ScalarField",
                     "name": "nodeId",
                     "storageKey": null
-                  }
+                  },
+                  (v1/*: any*/)
                 ],
                 "storageKey": null
-              }
+              },
+              (v2/*: any*/)
             ],
             "storageKey": null
           }
         ],
         "storageKey": "saved_promptsCollection(first:50)"
+      },
+      {
+        "alias": null,
+        "args": (v3/*: any*/),
+        "filters": null,
+        "handle": "connection",
+        "key": "Layout__saved_promptsCollection",
+        "kind": "LinkedHandle",
+        "name": "saved_promptsCollection"
       }
     ]
   },
   "params": {
-    "cacheID": "a71febe192b5ddc1ff1d0d800a07a44a",
+    "cacheID": "11fdc5027d195b5ba38d4ade6bb39d68",
     "id": null,
-    "metadata": {},
+    "metadata": {
+      "connection": [
+        {
+          "count": null,
+          "cursor": null,
+          "direction": "forward",
+          "path": [
+            "saved_promptsCollection"
+          ]
+        }
+      ]
+    },
     "name": "layoutQuery",
     "operationKind": "query",
-    "text": "query layoutQuery {\n  saved_promptsCollection(first: 50) {\n    pageInfo {\n      hasNextPage\n    }\n    edges {\n      node {\n        ...sidebar_prompts_fragment\n        nodeId\n      }\n    }\n  }\n}\n\nfragment sidebar_prompts_fragment on saved_prompts {\n  id\n  title\n  icon\n  instructions\n  winner\n}\n"
+    "text": "query layoutQuery {\n  saved_promptsCollection(first: 50) {\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n    edges {\n      node {\n        ...sidebar_prompts_fragment\n        nodeId\n        __typename\n      }\n      cursor\n    }\n  }\n}\n\nfragment sidebar_prompts_fragment on saved_prompts {\n  id\n  title\n  icon\n  instructions\n  winner\n}\n"
   }
 };
 })();
 
-(node as any).hash = "ee1c231cef9f436305b8e6cded6e6945";
+(node as any).hash = "1dfef1f58cb61b3d2cb9e19845f370a8";
 
 export default node;
