@@ -1,0 +1,15 @@
+---
+description: Use Yarn (not npm) for package operations
+alwaysApply: true
+---
+
+# Package manager: Yarn only
+
+- Use **Yarn** for all package manager operations in this repo.
+- Do **not** use `npm` commands (`npm install`, `npm update`, etc.).
+- Prefer:
+  - `yarn add <pkg>` / `yarn add -D <pkg>`
+  - `yarn remove <pkg>`
+  - `yarn install`
+  - `yarn dev`, `yarn build`, `yarn lint`
+

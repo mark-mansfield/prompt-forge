@@ -1,4 +1,5 @@
 import { Save, Play, Trash2, Sparkles, Target, MessageSquare, CircleX } from 'lucide-react';
+
 import { PromptEditorHeader } from './header';
 import type { DraftPrompt } from '../layout/types';
 
@@ -8,6 +9,7 @@ export const PromptEditor = ({
   handleClear,
   isLoading,
   canSave,
+  canDelete,
   handleSave,
   handleDelete,
   setTitle,
@@ -19,6 +21,7 @@ export const PromptEditor = ({
   handleClear: () => void;
   isLoading: boolean;
   canSave: boolean;
+  canDelete: boolean;
   handleSave: () => void;
   handleDelete: () => void;
   applyModifier: (type: 'clear' | 'quality' | 'tone') => void;
@@ -96,7 +99,7 @@ export const PromptEditor = ({
             Save
           </button>
           <button
-            disabled={!canSave}
+            disabled={!canDelete}
             onClick={handleDelete}
             className="disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded flex items-center gap-1 shadow-lg"
           >
