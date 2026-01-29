@@ -6,7 +6,7 @@ import { PromptEditor } from '../prompt-editor';
 import { typewriterEffect } from '../../utils/typewriter';
 import type { Prompt } from './types';
 import { commitMutation, graphql, useLazyLoadQuery, useRelayEnvironment } from 'react-relay';
-import { ConnectionHandler } from 'relay-runtime';
+import { ConnectionHandler, type RecordSourceSelectorProxy } from 'relay-runtime';
 import type { sidebar_prompts_fragment$key } from '../sidebar/__generated__/sidebar_prompts_fragment.graphql';
 import type { layoutQuery as LayoutQueryType } from './__generated__/layoutQuery.graphql';
 // TODO remove this after we implemnt the actual model respones
@@ -70,6 +70,14 @@ export const SavePromptMutation = graphql`
         instructions
         winner
       }
+    }
+  }
+`;
+
+export const DeletePromptMutation = graphql`
+  mutation layoutDeletePromptMutation($filter: saved_promptsFilter!) {
+    deleteFromsaved_promptsCollection(filter: $filter) {
+      affectedCount
     }
   }
 `;
@@ -182,7 +190,6 @@ export function Layout() {
     setCanSave(false);
   };
 
-  // TODO use relay to save the prompt
   function handleSave() {
     if (editingId) {
       // We only support creating new prompts for now.
@@ -214,6 +221,7 @@ export function Layout() {
 
         const root = store.getRoot();
         const connection = ConnectionHandler.getConnection(root, 'Layout__saved_promptsCollection');
+
         if (!connection) return;
 
         const edge = ConnectionHandler.createEdge(store, connection, inserted, 'saved_promptsEdge');
@@ -228,6 +236,33 @@ export function Layout() {
     });
   }
 
+  function handleDeletePrompt() {
+    if (!editingId) return;
+
+    const removeFromPromptsConnection = (store: RecordSourceSelectorProxy, id: string) => {
+      const root = store.getRoot();
+      const connection = ConnectionHandler.getConnection(root, 'Layout__saved_promptsCollection');
+      if (!connection) return;
+      ConnectionHandler.deleteNode(connection, id);
+    };
+
+    commitMutation(environment, {
+      mutation: DeletePromptMutation,
+      variables: { filter: { id: { eq: editingId } } },
+      optimisticUpdater: (store) => {
+        removeFromPromptsConnection(store, editingId);
+      },
+      updater: (store) => {
+        removeFromPromptsConnection(store, editingId);
+      },
+      onCompleted: () => {
+        handleClear();
+      },
+      onError: (err) => {
+        console.error('Failed to delete prompt:', err);
+      },
+    });
+  }
   // get the prompt from the relay cache
   function handleLoadPrompt(prompt: Prompt) {
     setEditingId(prompt.id);
@@ -262,6 +297,7 @@ export function Layout() {
           applyModifier={applyModifier}
           canSave={canSave && winner !== null}
           handleSave={handleSave}
+          handleDelete={handleDeletePrompt}
           setTitle={setTitle}
           setInstructions={setInstructions}
         />

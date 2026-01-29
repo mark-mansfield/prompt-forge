@@ -9,6 +9,7 @@ export const PromptEditor = ({
   isLoading,
   canSave,
   handleSave,
+  handleDelete,
   setTitle,
   setInstructions,
   applyModifier,
@@ -19,6 +20,7 @@ export const PromptEditor = ({
   isLoading: boolean;
   canSave: boolean;
   handleSave: () => void;
+  handleDelete: () => void;
   applyModifier: (type: 'clear' | 'quality' | 'tone') => void;
   setTitle: (title: string) => void;
   setInstructions: (instructions: string) => void;
@@ -95,7 +97,7 @@ export const PromptEditor = ({
           </button>
           <button
             disabled={!canSave}
-            onClick={handleSave}
+            onClick={handleDelete}
             className="disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded flex items-center gap-1 shadow-lg"
           >
             <Trash2 className="w-4 h-4" />
