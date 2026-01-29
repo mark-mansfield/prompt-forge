@@ -13,6 +13,7 @@ const sidebarPromptsFragment = graphql`
     icon
     instructions
     winner
+    model_responses
   }
 `;
 

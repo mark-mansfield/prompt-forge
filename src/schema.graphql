@@ -397,6 +397,7 @@ type saved_prompts implements Node {
   winner: winner_model!
   created_at: Datetime!
   updated_at: Datetime!
+  model_responses: JSON!
 }
 
 type saved_promptsConnection {
@@ -449,6 +450,7 @@ input saved_promptsInsertInput {
   winner: winner_model
   created_at: Datetime
   updated_at: Datetime
+  model_responses: JSON
 }
 
 type saved_promptsInsertResponse {
@@ -477,6 +479,7 @@ input saved_promptsUpdateInput {
   winner: winner_model
   created_at: Datetime
   updated_at: Datetime
+  model_responses: JSON
 }
 
 type saved_promptsUpdateResponse {

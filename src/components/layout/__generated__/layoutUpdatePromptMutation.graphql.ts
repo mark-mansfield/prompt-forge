@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<26a63ad907dd6e426ba49ea2f96f75aa>>
+ * @generated SignedSource<<e2670cfbdf11df18bc56b491a0703fb1>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -69,6 +69,7 @@ export type saved_promptsUpdateInput = {
   icon?: string | null | undefined;
   id?: any | null | undefined;
   instructions?: string | null | undefined;
+  model_responses?: any | null | undefined;
   title?: string | null | undefined;
   updated_at?: any | null | undefined;
   winner?: winner_model | null | undefined;

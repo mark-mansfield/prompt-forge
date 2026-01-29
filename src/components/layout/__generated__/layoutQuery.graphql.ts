@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<8c05bb7ad5bc21243ffb8d3ce4a82614>>
+ * @generated SignedSource<<b1665614dfad70971a4268519b8f9149>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -197,6 +197,13 @@ return {
                     "alias": null,
                     "args": null,
                     "kind": "ScalarField",
+                    "name": "model_responses",
+                    "storageKey": null
+                  },
+                  {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
                     "name": "nodeId",
                     "storageKey": null
                   },
@@ -223,7 +230,7 @@ return {
     ]
   },
   "params": {
-    "cacheID": "11fdc5027d195b5ba38d4ade6bb39d68",
+    "cacheID": "da01cdb4129b6fe25d7dd91ae1bfde07",
     "id": null,
     "metadata": {
       "connection": [
@@ -239,7 +246,7 @@ return {
     },
     "name": "layoutQuery",
     "operationKind": "query",
-    "text": "query layoutQuery {\n  saved_promptsCollection(first: 50) {\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n    edges {\n      node {\n        ...sidebar_prompts_fragment\n        nodeId\n        __typename\n      }\n      cursor\n    }\n  }\n}\n\nfragment sidebar_prompts_fragment on saved_prompts {\n  id\n  title\n  icon\n  instructions\n  winner\n}\n"
+    "text": "query layoutQuery {\n  saved_promptsCollection(first: 50) {\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n    edges {\n      node {\n        ...sidebar_prompts_fragment\n        nodeId\n        __typename\n      }\n      cursor\n    }\n  }\n}\n\nfragment sidebar_prompts_fragment on saved_prompts {\n  id\n  title\n  icon\n  instructions\n  winner\n  model_responses\n}\n"
   }
 };
 })();

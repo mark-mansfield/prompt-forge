@@ -19,6 +19,52 @@ import type {
   winner_model,
 } from '../components/sidebar/__generated__/sidebar_prompts_fragment.graphql';
 
+export type SavedModelResponse = {
+  model_id: string;
+  response: string;
+  created_at?: string;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+export function parseModelResponses(value: unknown): SavedModelResponse[] {
+  // Supabase GraphQL `JSON` can come through as:
+  // - a JSON string (common when the DB column itself is textified JSON)
+  // - already-parsed array/object (depending on resolver/serialization)
+  let parsed: unknown = value;
+
+  if (typeof parsed === 'string') {
+    const trimmed = parsed.trim();
+    if (!trimmed) return [];
+    try {
+      parsed = JSON.parse(trimmed) as unknown;
+    } catch (err) {
+      console.error('Failed to parse saved_prompts.model_responses JSON string:', err);
+      return [];
+    }
+  }
+
+  const items: unknown[] =
+    Array.isArray(parsed) ? parsed : isRecord(parsed) && Array.isArray(parsed.items) ? parsed.items : [];
+
+  const out: SavedModelResponse[] = [];
+  for (const item of items) {
+    if (!isRecord(item)) continue;
+    const modelId = item.model_id;
+    const response = item.response;
+    const createdAt = item.created_at;
+    if (typeof modelId !== 'string' || typeof response !== 'string') continue;
+    out.push({
+      model_id: modelId,
+      response,
+      created_at: typeof createdAt === 'string' ? createdAt : undefined,
+    });
+  }
+  return out;
+}
+
 export function parseWinner(value: winner_model | null | undefined): Winner {
   if (value === 'llama' || value === 'qwen') return value;
   throw new Error(
@@ -38,6 +84,7 @@ export function promptFromSidebarNode(node: sidebar_prompts_fragment$data[number
     instructions: node.instructions,
     icon: node.icon,
     winner: parseWinner(node.winner),
+    modelResponses: parseModelResponses((node as any).model_responses),
   };
 }
 

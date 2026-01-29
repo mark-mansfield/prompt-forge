@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<80b721ffb2a585cc6fd8a096f3ca5029>>
+ * @generated SignedSource<<19e1dba1cd2bf781030abcc7dc9fc07f>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -15,6 +15,7 @@ export type sidebar_prompts_fragment$data = ReadonlyArray<{
   readonly icon: string;
   readonly id: any;
   readonly instructions: string;
+  readonly model_responses: any;
   readonly title: string;
   readonly winner: winner_model;
   readonly " $fragmentType": "sidebar_prompts_fragment";
@@ -66,12 +67,19 @@ const node: ReaderFragment = {
       "kind": "ScalarField",
       "name": "winner",
       "storageKey": null
+    },
+    {
+      "alias": null,
+      "args": null,
+      "kind": "ScalarField",
+      "name": "model_responses",
+      "storageKey": null
     }
   ],
   "type": "saved_prompts",
   "abstractKey": null
 };
 
-(node as any).hash = "8f024e8a9afa97f45033658b5ef25323";
+(node as any).hash = "b2a5c79fed190befe41f03ed5a3c370b";
 
 export default node;
