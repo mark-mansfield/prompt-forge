@@ -6,7 +6,7 @@ import { PromptEditor } from '../prompt-editor';
 import { typewriterEffect } from '../../utils/typewriter';
 import type { Prompt } from './types';
 import { commitMutation, graphql, useLazyLoadQuery, useRelayEnvironment } from 'react-relay';
-import { ConnectionHandler, type RecordSourceSelectorProxy } from 'relay-runtime';
+import { useSavedPromptsConnectionUpdaters } from '../../relay/hooks/useSavedPromptsConnectionUpdaters';
 import type { sidebar_prompts_fragment$key } from '../sidebar/__generated__/sidebar_prompts_fragment.graphql';
 import type { layoutQuery as LayoutQueryType } from './__generated__/layoutQuery.graphql';
 // TODO remove this after we implemnt the actual model respones
@@ -74,6 +74,23 @@ export const SavePromptMutation = graphql`
   }
 `;
 
+export const UpdatePromptMutation = graphql`
+  mutation layoutUpdatePromptMutation(
+    $filter: saved_promptsFilter!
+    $set: saved_promptsUpdateInput!
+  ) {
+    updatesaved_promptsCollection(filter: $filter, set: $set) {
+      records {
+        id
+        title
+        icon
+        instructions
+        winner
+      }
+    }
+  }
+`;
+
 export const DeletePromptMutation = graphql`
   mutation layoutDeletePromptMutation($filter: saved_promptsFilter!) {
     deleteFromsaved_promptsCollection(filter: $filter) {
@@ -84,6 +101,12 @@ export const DeletePromptMutation = graphql`
 
 export function Layout() {
   const environment = useRelayEnvironment();
+  const {
+    addPromptToSidebarConnection,
+    updatePromptInSidebarConnection,
+    removePromptFromSidebarConnection,
+  } = useSavedPromptsConnectionUpdaters();
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [title, setTitle] = useState<string>('');
   const [canSave, setCanSave] = useState<boolean>(false);
@@ -188,19 +211,45 @@ export function Layout() {
     setIsLoading(false);
     setWinner(null);
     setCanSave(false);
+    setEditingId(null);
   };
 
   function handleSave() {
-    if (editingId) {
-      // We only support creating new prompts for now.
-      // Updating an existing saved prompt should use `updatesaved_promptsCollection`.
-      console.warn('Saving edits is not implemented yet (editingId present).');
-      return;
-    }
     if (!title.trim()) return;
     if (!instructions.trim()) return;
+    if (winner === null) return;
 
-    const icon = winner !== null && winner === 'llama' ? '🦙' : '🐍';
+    const icon = winner === 'llama' ? '🦙' : '🐍';
+
+    if (editingId) {
+      commitMutation(environment, {
+        mutation: UpdatePromptMutation,
+        variables: {
+          filter: { id: { eq: editingId } },
+          set: {
+            title,
+            instructions,
+            icon,
+            winner,
+            // NOTE: do NOT send id/nodeId/created_at/updated_at
+            // since those are Supabase-managed (db defaults/triggers).
+          },
+        },
+        optimisticUpdater: (store) => {
+          updatePromptInSidebarConnection(store, editingId, { title, instructions, icon, winner });
+        },
+        updater: (store) => {
+          updatePromptInSidebarConnection(store, editingId, { title, instructions, icon, winner });
+        },
+        onCompleted: () => {
+          setCanSave(false);
+        },
+        onError: (err) => {
+          console.error('Failed to update prompt:', err);
+        },
+      });
+      return;
+    }
 
     commitMutation(environment, {
       mutation: SavePromptMutation,
@@ -214,18 +263,11 @@ export function Layout() {
           // since those are Supabase-managed (db defaults/triggers).
         },
       },
+      optimisticUpdater: (store) => {
+        addPromptToSidebarConnection(store);
+      },
       updater: (store) => {
-        const payload = store.getRootField('insertIntosaved_promptsCollection');
-        const inserted = payload?.getLinkedRecords('records')?.[0];
-        if (!inserted) return;
-
-        const root = store.getRoot();
-        const connection = ConnectionHandler.getConnection(root, 'Layout__saved_promptsCollection');
-
-        if (!connection) return;
-
-        const edge = ConnectionHandler.createEdge(store, connection, inserted, 'saved_promptsEdge');
-        ConnectionHandler.insertEdgeBefore(connection, edge);
+        addPromptToSidebarConnection(store);
       },
       onCompleted: () => {
         setCanSave(false);
@@ -239,21 +281,14 @@ export function Layout() {
   function handleDeletePrompt() {
     if (!editingId) return;
 
-    const removeFromPromptsConnection = (store: RecordSourceSelectorProxy, id: string) => {
-      const root = store.getRoot();
-      const connection = ConnectionHandler.getConnection(root, 'Layout__saved_promptsCollection');
-      if (!connection) return;
-      ConnectionHandler.deleteNode(connection, id);
-    };
-
     commitMutation(environment, {
       mutation: DeletePromptMutation,
       variables: { filter: { id: { eq: editingId } } },
       optimisticUpdater: (store) => {
-        removeFromPromptsConnection(store, editingId);
+        removePromptFromSidebarConnection(store, editingId);
       },
       updater: (store) => {
-        removeFromPromptsConnection(store, editingId);
+        removePromptFromSidebarConnection(store, editingId);
       },
       onCompleted: () => {
         handleClear();
