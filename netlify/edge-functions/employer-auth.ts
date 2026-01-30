@@ -21,6 +21,20 @@ const SESSION_SECONDS = 60 * 60 * 24; // 24h
 let cachedSecret: string | null = null;
 let cachedKey: CryptoKey | null = null;
 
+function getEnv(name: string): string | undefined {
+  // Netlify Edge runtime provides Netlify.env.get(...)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const netlifyValue = (globalThis as any)?.Netlify?.env?.get?.(name);
+  if (typeof netlifyValue === 'string') return netlifyValue;
+
+  // Netlify CLI local dev currently runs Edge Functions in a Deno-like shim.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const denoValue = (globalThis as any)?.Deno?.env?.get?.(name);
+  if (typeof denoValue === 'string') return denoValue;
+
+  return undefined;
+}
+
 function base64UrlEncodeBytes(bytes: Uint8Array): string {
   let binary = '';
   for (const b of bytes) binary += String.fromCharCode(b);
@@ -59,7 +73,7 @@ function parseCookies(cookieHeader: string | null): Record<string, string> {
 }
 
 function getAllowedOrigins(): Set<string> {
-  const raw = Deno.env.get('EMPLOYER_ALLOWED_ORIGINS') ?? '';
+  const raw = getEnv('EMPLOYER_ALLOWED_ORIGINS') ?? '';
   return new Set(
     raw
       .split(',')
@@ -94,7 +108,7 @@ function corsHeadersForRequest(request: Request): {
 }
 
 async function getHmacKey(): Promise<CryptoKey> {
-  const secret = Deno.env.get('EMPLOYER_SESSION_SECRET') ?? '';
+  const secret = getEnv('EMPLOYER_SESSION_SECRET') ?? '';
   if (!secret) {
     throw new Error('Missing EMPLOYER_SESSION_SECRET');
   }
@@ -207,7 +221,7 @@ export default async (request: Request) => {
       return jsonResponse({ error: 'Password required' }, { status: 400, headers: cors.headers });
     }
 
-    const expectedPassword = Deno.env.get('EMPLOYER_PASSWORD');
+    const expectedPassword = getEnv('EMPLOYER_PASSWORD');
     if (!expectedPassword || password !== expectedPassword) {
       return jsonResponse({ error: 'Invalid password' }, { status: 401, headers: cors.headers });
     }
