@@ -23,11 +23,14 @@ A/B testing tool for comparing LLM prompt responses side-by-side.
 # Install dependencies
 yarn
 
-# Start development server
+# Start development server (Netlify dev + Edge Functions + Vite HMR)
 yarn dev
 ```
 
 The app will be available at `http://localhost:5173`
+
+> Note: `yarn dev` uses `netlify dev` so the Edge Function auth route (`/auth/employer`) works locally.
+> If you only want Vite (no Netlify functions), run `yarn dev:vite` instead.
 
 ## Employer password auth (Netlify Edge Function)
 
@@ -45,7 +48,7 @@ Run the app through Netlify so the Edge Function is available:
 netlify dev
 ```
 
-Open the app at `http://localhost:8888`.
+Open the app at `http://localhost:5173`.
 
 ### Required environment variables
 
@@ -53,13 +56,14 @@ Set these in your `.env` for local dev, and in Netlify site environment variable
 
 - `EMPLOYER_PASSWORD`: the passcode users must enter
 - `EMPLOYER_SESSION_SECRET`: HMAC secret used to sign the session cookie (use a long random value)
-- `EMPLOYER_ALLOWED_ORIGINS`: comma-separated allowlist for browser `Origin` (e.g. `http://localhost:8888`)
+- `EMPLOYER_ALLOWED_ORIGINS`: comma-separated allowlist for browser `Origin` (e.g. `http://localhost:5173`)
 
 ### Available Scripts
 
 | Command        | Description                   |
 | -------------- | ----------------------------- |
-| `yarn dev`     | Start development server      |
+| `yarn dev`     | Start Netlify dev server      |
+| `yarn dev:vite`| Start Vite only (no functions)|
 | `yarn build`   | Build for production          |
 | `yarn preview` | Preview production build      |
 | `yarn lint`    | Run ESLint                    |

@@ -6,9 +6,11 @@ publish = "dist"
 edge_functions = "netlify/edge-functions"
 
 [dev]
-command = "yarn dev -- --port 5173 --strictPort"
-targetPort = 5173
-port = 8888
+# Serve the site at 5173 so it matches common Supabase CORS configs,
+# while Vite runs behind the scenes on 5174.
+command = "yarn dev:vite -- --port 5174 --strictPort"
+targetPort = 5174
+port = 5173
 
 [[edge_functions]]
 path = "/auth/employer"
