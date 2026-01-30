@@ -1,7 +1,10 @@
 import { Save, Play, Trash2, Sparkles, Target, MessageSquare, CircleX } from 'lucide-react';
+import { useState } from 'react';
 
 import { PromptEditorHeader } from './header';
 import type { DraftPrompt } from '../layout/types';
+
+type ModifierType = 'clear' | 'quality' | 'tone';
 
 export const PromptEditor = ({
   prompt,
@@ -15,6 +18,7 @@ export const PromptEditor = ({
   setTitle,
   setInstructions,
   applyModifier,
+  modifierTextByType,
 }: {
   prompt: DraftPrompt;
   handleTestPrompt: () => void;
@@ -24,17 +28,41 @@ export const PromptEditor = ({
   canDelete: boolean;
   handleSave: () => void;
   handleDelete: () => void;
-  applyModifier: (type: 'clear' | 'quality' | 'tone') => void;
+  applyModifier: (type: ModifierType) => void;
+  modifierTextByType: Record<ModifierType, string>;
   setTitle: (title: string) => void;
   setInstructions: (instructions: string) => void;
 }) => {
   const { title, instructions } = prompt;
+  const [modifierAnnouncement, setModifierAnnouncement] = useState('');
+
+  const announceModifier = (type: ModifierType) => {
+    applyModifier(type);
+
+    const label: Record<ModifierType, string> = {
+      clear: 'Clarity',
+      quality: 'Quality',
+      tone: 'Tone',
+    };
+
+    // Force an aria-live update even if you click same modifier repeatedly.
+    setModifierAnnouncement('');
+    requestAnimationFrame(() => {
+      setModifierAnnouncement(`${label[type]} modifier applied. ${modifierTextByType[type]}`);
+    });
+  };
+
   return (
     <section className="border-b border-slate-700 p-4 flex flex-col">
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {modifierAnnouncement}
+      </div>
       <div className="flex items-center justify-between py-2">
         <PromptEditorHeader />
         <div className="flex gap-2">
           <button
+            aria-label="Test prompt"
+            title="Test prompt"
             onClick={handleTestPrompt}
             disabled={!instructions?.trim() || isLoading}
             className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
@@ -43,6 +71,8 @@ export const PromptEditor = ({
             {isLoading ? 'Testing...' : 'Run'}
           </button>
           <button
+            aria-label="Clear prompt"
+            title="Clear prompt"
             onClick={handleClear}
             className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm flex items-center gap-1"
           >
@@ -53,24 +83,27 @@ export const PromptEditor = ({
       </div>
       <div className="flex gap-2 p-2 bg-white/5  mb-6">
         <button
-          onClick={() => applyModifier('clear')}
+          title="Clarity"
+          onClick={() => announceModifier('clear')}
           className="px-4 py-2 bg-blue-500/20 text-blue-300 rounded hover:bg-blue-500/30 flex items-center gap-1"
         >
-          <Sparkles className="w-4 h-4" />
+          <Sparkles className="w-4 h-4" aria-hidden="true" />
           Clarity
         </button>
         <button
-          onClick={() => applyModifier('quality')}
+          title="Quality"
+          onClick={() => announceModifier('quality')}
           className="px-4 py-2 bg-emerald-500/20 text-emerald-300 rounded hover:bg-emerald-500/30 flex items-center gap-1"
         >
-          <Target className="w-4 h-4" />
+          <Target className="w-4 h-4" aria-hidden="true" />
           Quality
         </button>
         <button
-          onClick={() => applyModifier('tone')}
+          title="Tone"
+          onClick={() => announceModifier('tone')}
           className="px-4 py-2 bg-orange-500/20 text-orange-300 rounded hover:bg-orange-500/30 flex items-center gap-1"
         >
-          <MessageSquare className="w-4 h-4" />
+          <MessageSquare className="w-4 h-4" aria-hidden="true" />
           Tone
         </button>
       </div>
@@ -101,9 +134,11 @@ export const PromptEditor = ({
           <button
             disabled={!canDelete}
             onClick={handleDelete}
+            aria-label="Delete prompt"
+            title="Delete prompt"
             className="disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded flex items-center gap-1 shadow-lg"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       </div>

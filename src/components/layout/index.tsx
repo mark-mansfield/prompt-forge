@@ -263,6 +263,7 @@ export function Layout() {
           handleTestPrompt={handleTestPrompt}
           handleClear={handleClear}
           applyModifier={applyModifier}
+          modifierTextByType={MODIFIERS}
           canSave={canSavePrompt}
           canDelete={canDeletePrompt}
           handleSave={handleSave}
