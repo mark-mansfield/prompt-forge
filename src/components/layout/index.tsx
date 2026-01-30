@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Sidebar } from '../sidebar';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { History } from 'lucide-react';
 import { ModelResponse } from '../model-response';
 import { WinnerButton } from '../winner-button';
 import { PromptEditor } from '../prompt-editor';
@@ -12,6 +12,7 @@ import type { layoutSavePromptMutation } from './__generated__/layoutSavePromptM
 import type { layoutUpdatePromptMutation } from './__generated__/layoutUpdatePromptMutation.graphql';
 import type { layoutDeletePromptMutation } from './__generated__/layoutDeletePromptMutation.graphql';
 import { toast } from 'sonner';
+import { SidebarWithSheet } from '../sidebar/SidebarWithSheet';
 
 const MODIFIERS = {
   clear: 'Respond with perfect grammar, short sentences, active voice, no jargon.',
@@ -95,6 +96,8 @@ export function Layout() {
     data.saved_promptsCollection?.edges?.map((e) => e.node) ?? [];
 
   const [winner, setWinner] = useState<'llama' | 'qwen' | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   const [commitSavePrompt, isSaveInFlight] =
     useMutation<layoutSavePromptMutation>(SavePromptMutation);
@@ -242,17 +245,47 @@ export function Layout() {
     setLastSaved({ title: prompt.title, instructions: prompt.instructions, winner: prompt.winner });
     setModelResponses(prompt.modelResponses);
   }
-  console.log('editingId', editingId);
+
+  const openSidebar = useCallback(() => {
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
+    setIsSidebarOpen(true);
+  }, []);
+
+  const closeSidebar = useCallback(() => {
+    setIsSidebarOpen(false);
+    requestAnimationFrame(() => {
+      previousFocusRef.current?.focus?.();
+    });
+  }, []);
+
+  const hasPrompts = nodes.length > 0;
+
+  const openSidebarButton = useMemo(() => {
+    return (
+      <button
+        type="button"
+        aria-label="Open sidebar"
+        title={hasPrompts ? 'Open sidebar' : 'No prompts yet'}
+        onClick={openSidebar}
+        disabled={!hasPrompts}
+        className="md:hidden px-3 py-1.5 rounded text-sm flex items-center bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-800"
+      >
+        <History className="w-4 h-4" aria-hidden="true" />
+      </button>
+    );
+  }, [hasPrompts, openSidebar]);
+
   return (
     <div className="h-screen flex bg-slate-900 text-white">
-      {/* Left Sidebar - Saved Prompts */}
-      <Sidebar promptNodesRef={nodes} handleLoadPrompt={handleLoadPrompt} />
+      <SidebarWithSheet
+        isOpen={isSidebarOpen}
+        onClose={closeSidebar}
+        sidebarProps={{ promptNodesRef: nodes, handleLoadPrompt }}
+      />
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col">
         <PromptEditor
           prompt={{
-            id: crypto.randomUUID(),
             title,
             instructions,
             icon: winner !== null && winner === 'llama' ? '🦙' : '🐍',
@@ -264,6 +297,7 @@ export function Layout() {
           handleClear={handleClear}
           applyModifier={applyModifier}
           modifierTextByType={MODIFIERS}
+          openSidebarButton={openSidebarButton}
           canSave={canSavePrompt}
           canDelete={canDeletePrompt}
           handleSave={handleSave}
@@ -271,6 +305,7 @@ export function Layout() {
           setTitle={setTitle}
           setInstructions={setInstructions}
         />
+
         {/* Model Responses - Side by Side */}
         <section className="flex-1 grid grid-cols-2 min-h-0">
           {modelResponses.map((r, idx) => {

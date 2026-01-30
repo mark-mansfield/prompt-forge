@@ -1,4 +1,12 @@
-import { Save, Play, Trash2, Sparkles, Target, MessageSquare, CircleX } from 'lucide-react';
+import {
+  Save,
+  Play,
+  Trash2,
+  Sparkles,
+  Target,
+  MessageSquare,
+  CircleX,
+} from 'lucide-react';
 import { useState } from 'react';
 
 import { PromptEditorHeader } from './header';
@@ -19,6 +27,7 @@ export const PromptEditor = ({
   setInstructions,
   applyModifier,
   modifierTextByType,
+  openSidebarButton,
 }: {
   prompt: DraftPrompt;
   handleTestPrompt: () => void;
@@ -30,6 +39,7 @@ export const PromptEditor = ({
   handleDelete: () => void;
   applyModifier: (type: ModifierType) => void;
   modifierTextByType: Record<ModifierType, string>;
+  openSidebarButton?: React.ReactNode;
   setTitle: (title: string) => void;
   setInstructions: (instructions: string) => void;
 }) => {
@@ -58,8 +68,11 @@ export const PromptEditor = ({
         {modifierAnnouncement}
       </div>
       <div className="flex items-center justify-between py-2">
-        <PromptEditorHeader />
+        <div className="flex items-start gap-2">
+          <PromptEditorHeader />
+        </div>
         <div className="flex gap-2">
+          {openSidebarButton}
           <button
             aria-label="Test prompt"
             title="Test prompt"
