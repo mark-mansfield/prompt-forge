@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "netlify:dev": "netlify dev",
+    "netlify:dev:ci": "NETLIFY_CI=1 netlify dev",
     "build": "relay-compiler --validate && tsc -b && vite build",
     "lint": "eslint .",
     "format": "prettier --write src/",
