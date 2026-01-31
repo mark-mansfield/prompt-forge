@@ -115,8 +115,10 @@ function corsHeadersForRequest(request: Request): {
 
   const origin = request.headers.get('Origin');
   if (!origin) {
-    // Non-browser clients (e.g. curl) typically won't send Origin.
-    return { headers, allowed: true };
+    // Require an explicit Origin header so that all requests are subject to the
+    // EMPLOYER_ALLOWED_ORIGINS allow-list. Non-browser clients must send Origin
+    // explicitly if they need CORS access.
+    return { headers, allowed: false };
   }
 
   const allowedOrigins = getAllowedOrigins();
