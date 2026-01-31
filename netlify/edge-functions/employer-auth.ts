@@ -24,14 +24,35 @@ let cachedKey: CryptoKey | null = null;
 function getEnv(name: string): string | undefined {
   // Netlify Edge runtime provides Netlify.env.get(...)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const netlifyValue = (globalThis as any)?.Netlify?.env?.get?.(name);
+  const netlifyEnv = (globalThis as any)?.Netlify?.env;
+  const hasNetlifyEnv = typeof netlifyEnv?.get === 'function';
+  const netlifyValue = hasNetlifyEnv ? netlifyEnv.get(name) : undefined;
   if (typeof netlifyValue === 'string') return netlifyValue;
 
   // Netlify CLI local dev currently runs Edge Functions in a Deno-like shim.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const denoValue = (globalThis as any)?.Deno?.env?.get?.(name);
+  const denoEnv = (globalThis as any)?.Deno?.env;
+  const hasDenoEnv = typeof denoEnv?.get === 'function';
+  const denoValue = hasDenoEnv ? denoEnv.get(name) : undefined;
   if (typeof denoValue === 'string') return denoValue;
 
+  // If neither Netlify.env nor Deno.env is available, this runtime cannot
+  // access environment variables at all. Fail explicitly rather than
+  // silently returning undefined, since required secrets (e.g.
+  // EMPLOYER_SESSION_SECRET) would be missing.
+  if (!hasNetlifyEnv && !hasDenoEnv) {
+    // Use console.error for visibility in logs without introducing
+    // any additional dependencies.
+    // eslint-disable-next-line no-console
+    console.error(
+      `Environment access is not available in this runtime; ` +
+        `missing variable "${name}". Ensure this function runs ` +
+        `in a supported Netlify Edge or Deno-like environment.`
+    );
+    throw new Error(
+      `Environment variables are not accessible in this runtime (missing "${name}")`
+    );
+  }
   return undefined;
 }
 
