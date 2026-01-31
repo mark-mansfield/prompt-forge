@@ -22,6 +22,6 @@ export type Prompt = {
 /**
  * UI/editor model. Drafts can exist before the user picks a winner.
  */
-export type DraftPrompt = Omit<Prompt, 'winner'> & {
+export type DraftPrompt = Omit<Prompt, 'winner' | 'id'> & {
   winner: Winner | null;
 };

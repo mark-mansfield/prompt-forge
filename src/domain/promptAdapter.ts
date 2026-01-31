@@ -84,7 +84,7 @@ export function promptFromSidebarNode(node: sidebar_prompts_fragment$data[number
     instructions: node.instructions,
     icon: node.icon,
     winner: parseWinner(node.winner),
-    modelResponses: parseModelResponses((node as any).model_responses),
+    modelResponses: parseModelResponses(node.model_responses as unknown),
   };
 }
 

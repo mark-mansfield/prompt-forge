@@ -15,6 +15,7 @@ A/B testing tool for comparing LLM prompt responses side-by-side.
 
 - Node.js 18+
 - Yarn (`npm install -g yarn`)
+- Netlify CLI (`npm install -g netlify-cli`)
 
 ### Installation
 
@@ -22,17 +23,47 @@ A/B testing tool for comparing LLM prompt responses side-by-side.
 # Install dependencies
 yarn
 
-# Start development server
+# Start development server (Netlify dev + Edge Functions + Vite HMR)
 yarn dev
 ```
 
 The app will be available at `http://localhost:5173`
 
+> Note: `yarn dev` uses `netlify dev` so the Edge Function auth route (`/auth/employer`) works locally.
+> If you only want Vite (no Netlify functions), run `yarn dev:vite` instead.
+
+## Employer password auth (Netlify Edge Function)
+
+This project includes a simple password gate backed by a Netlify Edge Function.
+
+- **Edge Function**: `netlify/edge-functions/employer-auth.ts`
+- **Route**: `GET/POST /auth/employer`
+- **Cookie**: `pf_employer_session` (HMAC-signed + expiring; server-verified)
+
+### Local dev
+
+Run the app through Netlify so the Edge Function is available:
+
+```bash
+netlify dev
+```
+
+Open the app at `http://localhost:5173`.
+
+### Required environment variables
+
+Set these in your `.env` for local dev, and in Netlify site environment variables for deploys:
+
+- `EMPLOYER_PASSWORD`: the passcode users must enter
+- `EMPLOYER_SESSION_SECRET`: HMAC secret used to sign the session cookie (use a long random value)
+- `EMPLOYER_ALLOWED_ORIGINS`: comma-separated allowlist for browser `Origin` (e.g. `http://localhost:5173`)
+
 ### Available Scripts
 
 | Command        | Description                   |
 | -------------- | ----------------------------- |
-| `yarn dev`     | Start development server      |
+| `yarn dev`     | Start Netlify dev server      |
+| `yarn dev:vite`| Start Vite only (no functions)|
 | `yarn build`   | Build for production          |
 | `yarn preview` | Preview production build      |
 | `yarn lint`    | Run ESLint                    |
@@ -45,7 +76,7 @@ The app will be available at `http://localhost:5173`
 src/
 ├── components/
 │   ├── password-gate/    # Auth gate component
-│   └── split-layout/     # Main app layout
+│   └── layout/           # Main app layout
 ├── relay/                # Relay environment config
 ├── App.tsx               # Root component
 └── main.tsx              # Entry point
@@ -93,7 +124,6 @@ This lets multiple sidebar children react to tab changes without prop-drilling l
 
 - If Relay says `Query has no field activeTabIdBacking`, make sure `src/schema.client.graphql` is **saved to disk**
   and rerun `yarn relay`.
-- Do not use `@client` in Relay queries; the Relay compiler will fail with "Unknown directive 'client'".
 
 ### Code Formatting
 
@@ -105,7 +135,6 @@ yarn format
 
 ### Linting
 
-````bash
+```bash
 yarn lint
-g```
-````
+```

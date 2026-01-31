@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "netlify dev",
+    "dev:ci": "NETLIFY_CI=1 netlify dev",
+    "dev:vite": "vite",
     "build": "relay-compiler --validate && tsc -b && vite build",
     "lint": "eslint .",
     "format": "prettier --write src/",

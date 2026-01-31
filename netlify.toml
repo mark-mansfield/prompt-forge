@@ -1,0 +1,17 @@
+[build]
+command = "yarn build"
+publish = "dist"
+
+# Use the conventional Edge Functions directory.
+edge_functions = "netlify/edge-functions"
+
+[dev]
+# Serve the site at 5173 so it matches common Supabase CORS configs,
+# while Vite runs behind the scenes on 5174.
+command = "yarn dev:vite -- --port 5174 --strictPort"
+targetPort = 5174
+port = 5173
+
+[[edge_functions]]
+path = "/auth/employer"
+function = "employer-auth"
