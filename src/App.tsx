@@ -24,7 +24,9 @@ function App() {
   if (authorized === null) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
-        Checking session…
+        <div role="status" aria-live="polite">
+          Checking session…
+        </div>
       </div>
     );
   }
