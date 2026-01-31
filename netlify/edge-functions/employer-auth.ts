@@ -88,7 +88,9 @@ function parseCookies(cookieHeader: string | null): Record<string, string> {
   for (const part of parts) {
     const [rawName, ...rawValueParts] = part.trim().split('=');
     if (!rawName) continue;
-    out[rawName] = rawValueParts.join('=') ?? '';
+    const name = rawName.trim();
+    const value = rawValueParts.length > 0 ? rawValueParts.join('=') : '';
+    out[name] = value;
   }
   return out;
 }
