@@ -126,11 +126,41 @@ export function Layout() {
     setWinner(model);
   }
 
-  const isLoading = false;
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleTestPrompt = () => {
-    if (!instructions.trim() || isLoading) return;
-    toast('Testing is not implemented yet.');
+  const handleTestPrompt = async () => {
+    if (isLoading) return;
+    if (!instructions.trim()) return;
+    setIsLoading(true);
+
+    try {
+      const res = await fetch('/.netlify/functions/llm', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          provider: 'groq',
+          prompt: instructions.trim(),
+        }),
+      });
+
+      const data = (await res.json().catch(() => null)) as unknown;
+      if (!res.ok) {
+        const msg =
+          typeof (data as { error?: unknown } | null)?.error === 'string'
+            ? (data as { error: string }).error
+            : res.statusText;
+        throw new Error(`LLM request failed (${res.status}): ${msg}`);
+      }
+
+      console.log('LLM response:', data);
+      toast.success('LLM responses logged to console');
+    } catch (err) {
+      console.error('LLM test failed:', err);
+      toast.error('LLM test failed (see console)');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClear = () => {

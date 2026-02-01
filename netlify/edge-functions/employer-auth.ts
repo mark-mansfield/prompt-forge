@@ -43,7 +43,6 @@ function getEnv(name: string): string | undefined {
   if (!hasNetlifyEnv && !hasDenoEnv) {
     // Use console.error for visibility in logs without introducing
     // any additional dependencies.
-    // eslint-disable-next-line no-console
     console.error(
       `Environment access is not available in this runtime; ` +
         `missing variable "${name}". Ensure this function runs ` +

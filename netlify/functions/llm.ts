@@ -233,7 +233,6 @@ export async function handler(event: {
     return json(200, { provider, text: result.text }, corsHeaders);
   } catch (err) {
     // Error hygiene: no prompt logging, no raw upstream dumps.
-    // eslint-disable-next-line no-console
     console.error('llm function error', {
       message: err instanceof Error ? err.message : String(err),
     });
