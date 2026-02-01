@@ -15,6 +15,9 @@
     "get-schema": "node --env-file=.env ./scripts/fetch-schema.js"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.18",
+    "@ai-sdk/groq": "^3.0.19",
+    "ai": "^6.0.64",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-relay": "^20.1.1",
