@@ -134,27 +134,46 @@ export function Layout() {
     setIsLoading(true);
 
     try {
-      const res = await fetch('/.netlify/functions/llm', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          provider: 'groq',
-          prompt: instructions.trim(),
-        }),
+      const prompt = instructions.trim();
+
+      const call = async (provider: 'groq' | 'google') => {
+        const res = await fetch('/.netlify/functions/llm', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          credentials: 'include', // send gate cookie
+          body: JSON.stringify({ provider, prompt }),
+        });
+
+        const data = (await res.json().catch(() => null)) as unknown;
+        if (!res.ok) {
+          const msg =
+            typeof (data as { error?: unknown } | null)?.error === 'string'
+              ? (data as { error: string }).error
+              : res.statusText;
+          throw new Error(`${provider} request failed (${res.status}): ${msg}`);
+        }
+        return data;
+      };
+
+      const providers = ['groq', 'google'] as const;
+      const results = await Promise.allSettled(providers.map((p) => call(p)));
+
+      let anySucceeded = false;
+      results.forEach((r, idx) => {
+        const provider = providers[idx];
+        if (r.status === 'fulfilled') {
+          anySucceeded = true;
+          console.log(`LLM ${provider}:`, r.value);
+        } else {
+          console.error(`LLM ${provider} failed:`, r.reason);
+        }
       });
 
-      const data = (await res.json().catch(() => null)) as unknown;
-      if (!res.ok) {
-        const msg =
-          typeof (data as { error?: unknown } | null)?.error === 'string'
-            ? (data as { error: string }).error
-            : res.statusText;
-        throw new Error(`LLM request failed (${res.status}): ${msg}`);
+      if (anySucceeded) {
+        toast.success('LLM response(s) logged to console');
+      } else {
+        toast.error('LLM test failed (see console)');
       }
-
-      console.log('LLM response:', data);
-      toast.success('LLM responses logged to console');
     } catch (err) {
       console.error('LLM test failed:', err);
       toast.error('LLM test failed (see console)');

@@ -130,10 +130,35 @@ Do **not** expose either to the browser (avoid `VITE_` prefixes).
 
 Call the function from the client (any React component / temporary button is fine):
 
-- `fetch('/.netlify/functions/llm', { method: 'POST', headers: {'content-type':'application/json'}, body: JSON.stringify({ provider: 'groq', prompt: 'Tell me about yourself in 3 sentences.' }) })`
-- `console.log(await res.json())`
+Groq request:
 
-Repeat once with `provider: 'google'`.
+```ts
+const res = await fetch('/.netlify/functions/llm', {
+  method: 'POST',
+  headers: { 'content-type': 'application/json' },
+  credentials: 'include', // send gate cookie
+  body: JSON.stringify({
+    provider: 'groq',
+    prompt: 'Tell me about yourself in 3 sentences.',
+  }),
+});
+console.log(await res.json());
+```
+
+Google request (same endpoint, different provider):
+
+```ts
+const res = await fetch('/.netlify/functions/llm', {
+  method: 'POST',
+  headers: { 'content-type': 'application/json' },
+  credentials: 'include', // send gate cookie
+  body: JSON.stringify({
+    provider: 'google',
+    prompt: 'Tell me about yourself in 3 sentences.',
+  }),
+});
+console.log(await res.json());
+```
 
 ## Verify locally
 

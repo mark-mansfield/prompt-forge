@@ -1,6 +1,6 @@
 import { generateText } from 'ai';
 import { groq } from '@ai-sdk/groq';
-import { google } from '@ai-sdk/google';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createHmac, timingSafeEqual as nodeTimingSafeEqual } from 'node:crypto';
 
 // Netlify Function (Node runtime)
@@ -12,14 +12,24 @@ import { createHmac, timingSafeEqual as nodeTimingSafeEqual } from 'node:crypto'
 
 const COOKIE_NAME = 'pf_employer_session';
 
+// Google Generative AI provider defaults to the v1beta REST API. Some accounts / model
+// ids may require the stable v1 endpoint. See @ai-sdk/google docs: baseURL option.
+const google = createGoogleGenerativeAI({
+  baseURL: 'https://generativelanguage.googleapis.com/v1',
+});
+
 const PROMPT_MAX_CHARS = 4000;
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 const RATE_LIMIT_MAX_REQUESTS = 30; // per window
-
+const GOOGLE_MODEL_ID = process.env.GOOGLE_MODEL_ID ?? 'gemini-2.5-flash';
+const GROQ_MODEL_ID = process.env.GROQ_MODEL_ID ?? 'llama-3.1-8b-instant';
 type Provider = 'groq' | 'google';
 type SessionPayload = { exp: number; iat: number };
 
-function getHeader(headers: Record<string, string | undefined> | undefined, name: string): string | undefined {
+function getHeader(
+  headers: Record<string, string | undefined> | undefined,
+  name: string
+): string | undefined {
   if (!headers) return undefined;
   const direct = headers[name];
   if (direct) return direct;
@@ -54,7 +64,10 @@ function parseCookies(cookieHeader: string | undefined): Record<string, string> 
 }
 
 function base64UrlDecodeToBytes(input: string): Buffer {
-  const padded = input.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(input.length / 4) * 4, '=');
+  const padded = input
+    .replace(/-/g, '+')
+    .replace(/_/g, '/')
+    .padEnd(Math.ceil(input.length / 4) * 4, '=');
   return Buffer.from(padded, 'base64');
 }
 
@@ -140,7 +153,10 @@ function rateLimit(key: string): { allowed: true } | { allowed: false; retryAfte
     return { allowed: true };
   }
   if (bucket.count >= RATE_LIMIT_MAX_REQUESTS) {
-    return { allowed: false, retryAfterSeconds: Math.max(1, Math.ceil((bucket.resetAtMs - now) / 1000)) };
+    return {
+      allowed: false,
+      retryAfterSeconds: Math.max(1, Math.ceil((bucket.resetAtMs - now) / 1000)),
+    };
   }
   bucket.count += 1;
   return { allowed: true };
@@ -221,8 +237,7 @@ export async function handler(event: {
   }
 
   try {
-    const model =
-      (provider as Provider) === 'groq' ? groq('llama-3.1-8b-instant') : google('gemini-1.5-flash');
+    const model = (provider as Provider) === 'groq' ? groq(GROQ_MODEL_ID) : google(GOOGLE_MODEL_ID);
 
     const result = await generateText({
       model,
@@ -239,4 +254,3 @@ export async function handler(event: {
     return json(500, { error: 'LLM request failed' }, corsHeaders);
   }
 }
-
