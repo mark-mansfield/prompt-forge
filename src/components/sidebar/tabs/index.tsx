@@ -2,13 +2,14 @@ import { useRelayEnvironment } from 'react-relay';
 import { setActiveTabId } from '../../../relay/ui-state';
 type Tab = {
   id: string;
-  name: string;
+  shortName: string;
+  fullName?: string;
 };
 
 const TABS: Tab[] = [
-  { id: 'all', name: 'All' },
-  { id: 'llama', name: 'Llama' },
-  { id: 'qwen', name: 'Qwen' },
+  { id: 'all', shortName: 'All' },
+  { id: 'llama-3.1-8b-instant', shortName: 'Llama', fullName: 'llama-3.1-8b-instant' },
+  { id: 'gemini-2.5-flash', shortName: 'Gemini', fullName: 'gemini-2.5-flash' },
 ];
 
 export const Tabs = ({ activeTabId }: { activeTabId: string }): React.ReactNode => {
@@ -19,10 +20,11 @@ export const Tabs = ({ activeTabId }: { activeTabId: string }): React.ReactNode 
       {TABS.map((tab) => (
         <button
           key={tab.id}
+          title={tab.fullName ?? tab.shortName}
           className={`text-sm font-medium text-slate-400 hover:text-white ${activeTabId === tab.id ? 'text-white border-b-2 border-blue-500' : 'border-b-2 border-transparent'}`}
           onClick={() => setActiveTabId(environment, tab.id)}
         >
-          {tab.name}
+          {tab.shortName}
         </button>
       ))}
     </div>

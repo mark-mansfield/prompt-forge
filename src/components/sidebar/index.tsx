@@ -32,8 +32,18 @@ export function Sidebar({ promptNodesRef, handleLoadPrompt }: Props) {
   const { activeTabId } = useLazyLoadQuery<SidebarActiveTabQueryType>(sidebarActiveTabQuery, {});
   const prompts = useFragment(sidebarPromptsFragment, promptNodesRef);
 
+  const winnerToModelId = (winner: string) => {
+    // TODO(mark): Remove this mapping once the DB winner values and tabs are migrated
+    // to use only model IDs (`llama-3.1-8b-instant`, `gemini-2.5-flash`) end-to-end.
+    if (winner === 'llama') return 'llama-3.1-8b-instant';
+    if (winner === 'qwen') return 'gemini-2.5-flash';
+    return winner;
+  };
+
   const visiblePrompts =
-    activeTabId === 'all' ? prompts : prompts.filter((p) => p.winner === activeTabId);
+    activeTabId === 'all'
+      ? prompts
+      : prompts.filter((p) => winnerToModelId(String(p.winner)) === activeTabId);
 
   return (
     <aside className="w-full md:w-68 border-r border-slate-700 flex flex-col overflow-y-auto">

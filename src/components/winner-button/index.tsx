@@ -1,10 +1,10 @@
 import { Crown } from 'lucide-react';
 export const WinnerButton = ({
-  model,
+  label,
   onClick,
   isWinner,
 }: {
-  model: 'llama' | 'qwen';
+  label: string;
   onClick: () => void;
   isWinner: boolean;
 }) => {
@@ -19,7 +19,7 @@ export const WinnerButton = ({
           WINNER
         </>
       ) : (
-        `Make ${model} Winner`
+        `Make ${label} Winner`
       )}
     </button>
   );

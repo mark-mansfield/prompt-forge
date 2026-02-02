@@ -1,12 +1,4 @@
-import {
-  Save,
-  Play,
-  Trash2,
-  Sparkles,
-  Target,
-  MessageSquare,
-  CircleX,
-} from 'lucide-react';
+import { Save, Play, Trash2, Sparkles, Target, MessageSquare, CircleX, Square } from 'lucide-react';
 import { useState } from 'react';
 
 import { PromptEditorHeader } from './header';
@@ -17,6 +9,7 @@ type ModifierType = 'clear' | 'quality' | 'tone';
 export const PromptEditor = ({
   prompt,
   handleTestPrompt,
+  handleStop,
   handleClear,
   isLoading,
   canSave,
@@ -31,6 +24,7 @@ export const PromptEditor = ({
 }: {
   prompt: DraftPrompt;
   handleTestPrompt: () => void;
+  handleStop: () => void;
   handleClear: () => void;
   isLoading: boolean;
   canSave: boolean;
@@ -84,6 +78,16 @@ export const PromptEditor = ({
             {isLoading ? 'Testing...' : 'Run'}
           </button>
           <button
+            aria-label="Stop"
+            title="Stop"
+            onClick={handleStop}
+            disabled={!isLoading}
+            className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+          >
+            <Square className="w-3 h-3" />
+            Stop
+          </button>
+          <button
             aria-label="Clear prompt"
             title="Clear prompt"
             onClick={handleClear}
@@ -135,6 +139,7 @@ export const PromptEditor = ({
           onChange={(e) => setInstructions(e.target.value)}
           className="flex-1 w-full p-3 bg-slate-800 border border-slate-700 rounded text-white placeholder-slate-500 resize-none focus:outline-none focus:border-slate-600"
         />
+
         <div className="w-full flex gap-2 justify-end">
           <button
             disabled={!canSave}
