@@ -48,7 +48,7 @@ export function Sidebar({ promptNodesRef, handleLoadPrompt }: Props) {
       : prompts.filter((p) => winnerToModelId(String(p.winner)) === activeTabId);
 
   return (
-    <aside className="w-full md:w-68 border-r border-slate-700 flex flex-col overflow-y-auto">
+    <aside className="w-full h-full md:w-68 border-r border-slate-700 flex flex-col overflow-y-auto">
       <div className="sticky top-0 z-50 bg-slate-900">
         <div className="p-4 flex items-center gap-2 border-b border-slate-700">
           <AnvilIcon size={24} />

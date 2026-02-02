@@ -54,7 +54,7 @@ export const ModelResponse = ({
     <div className="border-r border-slate-700 flex flex-col">
       <div className="p-3 border-b border-slate-700">
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="flex items-center gap-2 min-w-0 h-10">
             <span className={`w-2 h-2 ${dot} rounded-full`} aria-hidden="true" />
             <h3 className="text-sm font-medium truncate">{modelName}</h3>
             {headerInline ? <div className="shrink-0">{headerInline}</div> : null}
