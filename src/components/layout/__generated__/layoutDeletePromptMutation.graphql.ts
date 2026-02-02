@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<7173492bb46d5ca56b184d7f63c6c330>>
+ * @generated SignedSource<<5ad7af249bb371177d087096039fd69b>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,7 +10,7 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type FilterIs = "NOT_NULL" | "NULL" | "%future added value";
-export type winner_model = "llama" | "qwen" | "%future added value";
+export type winner_model_enum = "gemini" | "llama" | "%future added value";
 export type saved_promptsFilter = {
   and?: ReadonlyArray<saved_promptsFilter> | null | undefined;
   created_at?: DatetimeFilter | null | undefined;
@@ -22,7 +22,7 @@ export type saved_promptsFilter = {
   or?: ReadonlyArray<saved_promptsFilter> | null | undefined;
   title?: StringFilter | null | undefined;
   updated_at?: DatetimeFilter | null | undefined;
-  winner?: winner_modelFilter | null | undefined;
+  winner?: winner_model_enumFilter | null | undefined;
 };
 export type UUIDFilter = {
   eq?: any | null | undefined;
@@ -45,11 +45,11 @@ export type StringFilter = {
   regex?: string | null | undefined;
   startsWith?: string | null | undefined;
 };
-export type winner_modelFilter = {
-  eq?: winner_model | null | undefined;
-  in?: ReadonlyArray<winner_model> | null | undefined;
+export type winner_model_enumFilter = {
+  eq?: winner_model_enum | null | undefined;
+  in?: ReadonlyArray<winner_model_enum> | null | undefined;
   is?: FilterIs | null | undefined;
-  neq?: winner_model | null | undefined;
+  neq?: winner_model_enum | null | undefined;
 };
 export type DatetimeFilter = {
   eq?: any | null | undefined;

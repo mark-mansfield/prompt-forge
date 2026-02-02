@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<19e1dba1cd2bf781030abcc7dc9fc07f>>
+ * @generated SignedSource<<97553c4a5fd26153497ce0e01d737ce3>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,7 @@
 // @ts-nocheck
 
 import { ReaderFragment } from 'relay-runtime';
-export type winner_model = "llama" | "qwen" | "%future added value";
+export type winner_model_enum = "gemini" | "llama" | "%future added value";
 import { FragmentRefs } from "relay-runtime";
 export type sidebar_prompts_fragment$data = ReadonlyArray<{
   readonly icon: string;
@@ -17,7 +17,7 @@ export type sidebar_prompts_fragment$data = ReadonlyArray<{
   readonly instructions: string;
   readonly model_responses: any;
   readonly title: string;
-  readonly winner: winner_model;
+  readonly winner: winner_model_enum;
   readonly " $fragmentType": "sidebar_prompts_fragment";
 }>;
 export type sidebar_prompts_fragment$key = ReadonlyArray<{

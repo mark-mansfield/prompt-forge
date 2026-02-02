@@ -1,4 +1,4 @@
-export type Winner = 'llama' | 'qwen';
+export type Winner = 'llama' | 'gemini';
 
 export type SavedModelResponse = {
   model_id: string;

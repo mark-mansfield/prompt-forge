@@ -394,7 +394,7 @@ type saved_prompts implements Node {
   title: String!
   instructions: String!
   icon: String!
-  winner: winner_model!
+  winner: winner_model_enum!
   created_at: Datetime!
   updated_at: Datetime!
   model_responses: JSON!
@@ -423,7 +423,7 @@ input saved_promptsFilter {
   title: StringFilter
   instructions: StringFilter
   icon: StringFilter
-  winner: winner_modelFilter
+  winner: winner_model_enumFilter
   created_at: DatetimeFilter
   updated_at: DatetimeFilter
   nodeId: IDFilter
@@ -447,7 +447,7 @@ input saved_promptsInsertInput {
   title: String
   instructions: String
   icon: String
-  winner: winner_model
+  winner: winner_model_enum
   created_at: Datetime
   updated_at: Datetime
   model_responses: JSON
@@ -476,7 +476,7 @@ input saved_promptsUpdateInput {
   title: String
   instructions: String
   icon: String
-  winner: winner_model
+  winner: winner_model_enum
   created_at: Datetime
   updated_at: Datetime
   model_responses: JSON
@@ -503,4 +503,19 @@ input winner_modelFilter {
   in: [winner_model!]
   is: FilterIs
   neq: winner_model
+}
+
+enum winner_model_enum {
+  llama
+  gemini
+}
+
+"""
+Boolean expression comparing fields on type "winner_model_enum"
+"""
+input winner_model_enumFilter {
+  eq: winner_model_enum
+  in: [winner_model_enum!]
+  is: FilterIs
+  neq: winner_model_enum
 }

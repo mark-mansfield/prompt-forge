@@ -89,14 +89,14 @@ export function Layout() {
   const [lastSaved, setLastSaved] = useState<{
     title: string;
     instructions: string;
-    winner: 'llama' | 'qwen' | null;
+    winner: 'llama' | 'gemini' | null;
   } | null>(null);
 
   const data = useLazyLoadQuery<LayoutQueryType>(LayoutQuery, {});
   const nodes: sidebar_prompts_fragment$key =
     data.saved_promptsCollection?.edges?.map((e) => e.node) ?? [];
 
-  const [winner, setWinner] = useState<'llama' | 'qwen' | null>(null);
+  const [winner, setWinner] = useState<'llama' | 'gemini' | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const streamControllersRef = useRef<{
@@ -127,7 +127,7 @@ export function Layout() {
     setInstructions((prev) => prev + '\n\n' + MODIFIERS[type]);
   }
 
-  function handleWinner(winnerEnum: 'llama' | 'qwen') {
+  function handleWinner(winnerEnum: 'llama' | 'gemini') {
     setWinner(winnerEnum);
   }
 
@@ -638,7 +638,7 @@ export function Layout() {
             const provider: 'groq' | 'google' =
               modelId === 'llama-3.1-8b-instant' ? 'groq' : 'google';
             const canPickWinner = true;
-            const winnerEnum: 'llama' | 'qwen' = provider === 'groq' ? 'llama' : 'qwen';
+            const winnerEnum: 'llama' | 'gemini' = provider === 'groq' ? 'llama' : 'gemini';
 
             const googleDropdown =
               provider === 'google' ? (

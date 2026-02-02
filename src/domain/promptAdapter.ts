@@ -16,7 +16,7 @@
 import type { Prompt, Winner } from '../components/layout/types';
 import type {
   sidebar_prompts_fragment$data,
-  winner_model,
+  winner_model_enum,
 } from '../components/sidebar/__generated__/sidebar_prompts_fragment.graphql';
 
 export type SavedModelResponse = {
@@ -46,8 +46,11 @@ export function parseModelResponses(value: unknown): SavedModelResponse[] {
     }
   }
 
-  const items: unknown[] =
-    Array.isArray(parsed) ? parsed : isRecord(parsed) && Array.isArray(parsed.items) ? parsed.items : [];
+  const items: unknown[] = Array.isArray(parsed)
+    ? parsed
+    : isRecord(parsed) && Array.isArray(parsed.items)
+      ? parsed.items
+      : [];
 
   const out: SavedModelResponse[] = [];
   for (const item of items) {
@@ -65,8 +68,8 @@ export function parseModelResponses(value: unknown): SavedModelResponse[] {
   return out;
 }
 
-export function parseWinner(value: winner_model | null | undefined): Winner {
-  if (value === 'llama' || value === 'qwen') return value;
+export function parseWinner(value: winner_model_enum | null | undefined): Winner {
+  if (value === 'llama' || value === 'gemini') return value;
   throw new Error(
     `Unsupported winner value from backend: ${String(value)}. ` +
       `Update the domain adapter in src/domain/promptAdapter.ts to handle the new enum value.`
@@ -87,4 +90,3 @@ export function promptFromSidebarNode(node: sidebar_prompts_fragment$data[number
     modelResponses: parseModelResponses(node.model_responses as unknown),
   };
 }
-
