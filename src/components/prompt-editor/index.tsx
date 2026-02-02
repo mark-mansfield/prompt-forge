@@ -5,10 +5,11 @@ import { PromptEditorHeader } from './header';
 import type { DraftPrompt } from '../layout/types';
 
 type ModifierType = 'clear' | 'quality' | 'tone';
+type ModifierAction = 'added' | 'removed';
 
 export const PromptEditor = ({
   prompt,
-  handleTestPrompt,
+  handleExecutePrompt,
   handleStop,
   handleClear,
   isLoading,
@@ -20,10 +21,11 @@ export const PromptEditor = ({
   setInstructions,
   applyModifier,
   modifierTextByType,
+  activeModifiers,
   openSidebarButton,
 }: {
   prompt: DraftPrompt;
-  handleTestPrompt: () => void;
+  handleExecutePrompt: () => void;
   handleStop: () => void;
   handleClear: () => void;
   isLoading: boolean;
@@ -31,17 +33,19 @@ export const PromptEditor = ({
   canDelete: boolean;
   handleSave: () => void;
   handleDelete: () => void;
-  applyModifier: (type: ModifierType) => void;
+  applyModifier: (type: ModifierType) => ModifierAction;
   modifierTextByType: Record<ModifierType, string>;
+  activeModifiers?: ModifierType[];
   openSidebarButton?: React.ReactNode;
   setTitle: (title: string) => void;
   setInstructions: (instructions: string) => void;
 }) => {
   const { title, instructions } = prompt;
   const [modifierAnnouncement, setModifierAnnouncement] = useState('');
+  const activeSet = new Set(activeModifiers ?? []);
 
   const announceModifier = (type: ModifierType) => {
-    applyModifier(type);
+    const action = applyModifier(type);
 
     const label: Record<ModifierType, string> = {
       clear: 'Clarity',
@@ -52,6 +56,10 @@ export const PromptEditor = ({
     // Force an aria-live update even if you click same modifier repeatedly.
     setModifierAnnouncement('');
     requestAnimationFrame(() => {
+      if (action === 'removed') {
+        setModifierAnnouncement(`${label[type]} modifier removed.`);
+        return;
+      }
       setModifierAnnouncement(`${label[type]} modifier applied. ${modifierTextByType[type]}`);
     });
   };
@@ -70,7 +78,7 @@ export const PromptEditor = ({
           <button
             aria-label="Test prompt"
             title="Test prompt"
-            onClick={handleTestPrompt}
+            onClick={handleExecutePrompt}
             disabled={!instructions?.trim() || isLoading}
             className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
           >
@@ -102,7 +110,12 @@ export const PromptEditor = ({
         <button
           title="Clarity"
           onClick={() => announceModifier('clear')}
-          className="px-4 py-2 bg-blue-500/20 text-blue-300 rounded hover:bg-blue-500/30 flex items-center gap-1"
+          aria-pressed={activeSet.has('clear')}
+          className={`px-4 py-2 rounded flex items-center gap-1 ${
+            activeSet.has('clear')
+              ? 'bg-blue-500/30 text-blue-200 ring-1 ring-blue-300/40'
+              : 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/30'
+          }`}
         >
           <Sparkles className="w-4 h-4" aria-hidden="true" />
           Clarity
@@ -110,7 +123,12 @@ export const PromptEditor = ({
         <button
           title="Quality"
           onClick={() => announceModifier('quality')}
-          className="px-4 py-2 bg-emerald-500/20 text-emerald-300 rounded hover:bg-emerald-500/30 flex items-center gap-1"
+          aria-pressed={activeSet.has('quality')}
+          className={`px-4 py-2 rounded flex items-center gap-1 ${
+            activeSet.has('quality')
+              ? 'bg-emerald-500/30 text-emerald-200 ring-1 ring-emerald-300/40'
+              : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30'
+          }`}
         >
           <Target className="w-4 h-4" aria-hidden="true" />
           Quality
@@ -118,7 +136,12 @@ export const PromptEditor = ({
         <button
           title="Tone"
           onClick={() => announceModifier('tone')}
-          className="px-4 py-2 bg-orange-500/20 text-orange-300 rounded hover:bg-orange-500/30 flex items-center gap-1"
+          aria-pressed={activeSet.has('tone')}
+          className={`px-4 py-2 rounded flex items-center gap-1 ${
+            activeSet.has('tone')
+              ? 'bg-orange-500/30 text-orange-200 ring-1 ring-orange-300/40'
+              : 'bg-orange-500/20 text-orange-300 hover:bg-orange-500/30'
+          }`}
         >
           <MessageSquare className="w-4 h-4" aria-hidden="true" />
           Tone

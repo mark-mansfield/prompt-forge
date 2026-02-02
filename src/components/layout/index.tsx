@@ -14,12 +14,8 @@ import type { layoutUpdatePromptMutation } from './__generated__/layoutUpdatePro
 import type { layoutDeletePromptMutation } from './__generated__/layoutDeletePromptMutation.graphql';
 import { toast } from 'sonner';
 import { SidebarWithSheet } from '../sidebar/SidebarWithSheet';
-
-const MODIFIERS = {
-  clear: 'Respond with perfect grammar, short sentences, active voice, no jargon.',
-  quality: 'Be specific, comprehensive, include examples, cite reasoning.',
-  tone: 'Match professional tone. Confident, direct, persuasive.',
-};
+import type { ModifierType } from '../../utils/modifier-tools';
+import { detectActiveModifiers, toggleModifierInText, MODIFIERS } from '../../utils/modifier-tools';
 
 const LayoutQuery = graphql`
   query layoutQuery {
@@ -123,8 +119,19 @@ export function Layout() {
   const canSavePrompt = isValid && isDirty && winner !== null && !isMutating;
   const canDeletePrompt = Boolean(editingId) && !isMutating;
 
-  function applyModifier(type: keyof typeof MODIFIERS) {
-    setInstructions((prev) => prev + '\n\n' + MODIFIERS[type]);
+  const activeModifiers = useMemo(
+    () => Array.from(detectActiveModifiers(instructions)),
+    [instructions]
+  );
+
+  function applyModifier(type: ModifierType): 'added' | 'removed' {
+    let action: 'added' | 'removed' = 'added';
+    setInstructions((prev) => {
+      const result = toggleModifierInText(prev, type);
+      action = result.action;
+      return result.nextText;
+    });
+    return action;
   }
 
   function handleWinner(winnerEnum: 'llama' | 'gemini') {
@@ -354,7 +361,7 @@ export function Layout() {
     [googleSelectedModelId, providerToModelId.groq]
   );
 
-  const handleTestPrompt = async () => {
+  const handleExecutePrompt = async () => {
     if (isLoading) return;
     if (!instructions.trim()) return;
 
@@ -616,11 +623,12 @@ export function Layout() {
             modelResponses,
           }}
           isLoading={isLoading}
-          handleTestPrompt={handleTestPrompt}
+          handleExecutePrompt={handleExecutePrompt}
           handleStop={handleStop}
           handleClear={handleClear}
           applyModifier={applyModifier}
           modifierTextByType={MODIFIERS}
+          activeModifiers={activeModifiers}
           openSidebarButton={openSidebarButton}
           canSave={canSavePrompt}
           canDelete={canDeletePrompt}
