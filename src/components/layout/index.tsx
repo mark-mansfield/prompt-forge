@@ -599,7 +599,7 @@ export function Layout() {
   }, [hasPrompts, openSidebar]);
 
   return (
-    <div className="h-screen flex bg-slate-900 text-white">
+    <div className="min-h-screen flex bg-slate-900 text-white">
       <SidebarWithSheet
         isOpen={isSidebarOpen}
         onClose={closeSidebar}
@@ -631,7 +631,7 @@ export function Layout() {
         />
 
         {/* Model Responses - Side by Side */}
-        <section className="flex-1 grid grid-cols-2 min-h-0">
+        <section className="grid grid-cols-2 items-stretch min-h-screen">
           {modelResponses.map((r, idx) => {
             const modelId = normalizeModelId(r.model_id);
             const key = `${modelId}-${r.created_at ?? idx}`;

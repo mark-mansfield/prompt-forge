@@ -33,13 +33,15 @@ export function Sidebar({ promptNodesRef, handleLoadPrompt }: Props) {
   const prompts = useFragment(sidebarPromptsFragment, promptNodesRef);
 
   const winnerToModelId = (winner: string) => {
-    // TODO(mark): Remove this mapping once the DB winner values and tabs are migrated
-    // to use only model IDs (`llama-3.1-8b-instant`, `gemini-2.5-flash`) end-to-end.
     if (winner === 'llama') return 'llama-3.1-8b-instant';
-    if (winner === 'qwen') return 'gemini-2.5-flash';
+    if (winner === 'gemini') return 'gemini-2.5-flash';
     return winner;
   };
 
+  // NOTE: Tabs *appear* model-id keyed (`llama-3.1-8b-instant`, `gemini-2.5-flash`),
+  // but filtering is effectively *provider-level* via `winner` (mapped by `winnerToModelId`).
+  // This means all Gemini winners (including different Google model variants like Flash/Flash‑Lite)
+  // show up under the single "Gemini" tab.
   const visiblePrompts =
     activeTabId === 'all'
       ? prompts
