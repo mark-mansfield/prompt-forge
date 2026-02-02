@@ -116,7 +116,9 @@ export function Layout() {
         instructions !== lastSaved.instructions ||
         winner !== lastSaved.winner;
 
-  const canSavePrompt = isValid && isDirty && winner !== null && !isMutating;
+  const hasAnyModelResponses = modelResponses.some((r) => Boolean(r.response?.trim()));
+  const canSavePrompt =
+    isValid && isDirty && winner !== null && !isMutating && hasAnyModelResponses;
   const canDeletePrompt = Boolean(editingId) && !isMutating;
 
   const activeModifiers = useMemo(
@@ -444,35 +446,19 @@ export function Layout() {
 
     const icon = winner === 'llama' ? '🦙' : '♊';
 
-    // Persist both model responses (only model_id + response).
-    // Supabase GraphQL `JSON` inputs can be finicky; in practice, sending a JSON string
-    // is the most compatible format. We intentionally omit created_at/updated_at.
-    const modelResponsesForSave = (() => {
-      const requiredModelIds = ['llama-3.1-8b-instant', googleSelectedModelId] as const;
+    if (editingId) {
+      // Editing an existing prompt: keep whatever model responses are already present,
+      // without requiring a fresh run (saved prompts may not have UI-only `status`).
+      const out = modelResponses
+        .map((r) => ({ model_id: normalizeModelId(r.model_id), response: r.response }))
+        .filter((r) => r.response.trim());
 
-      const byModelId = new Map(
-        modelResponses.map((r) => [normalizeModelId(r.model_id), r] as const)
-      );
-
-      const out: Array<{ model_id: string; response: string }> = [];
-
-      for (const uiModelId of requiredModelIds) {
-        const r = byModelId.get(uiModelId);
-        if (!r || r.status !== 'done' || !r.response.trim()) return null;
-
-        // Store the full model id in the JSON column (not the winner enum).
-        out.push({ model_id: uiModelId, response: r.response });
+      if (out.length === 0) {
+        toast.error('Run a model at least once before saving');
+        return;
       }
 
-      return JSON.stringify(out);
-    })();
-
-    if (!modelResponsesForSave) {
-      toast.error('Run both models and wait for completion before saving');
-      return;
-    }
-
-    if (editingId) {
+      const modelResponsesForSave = JSON.stringify(out);
       commitUpdatePrompt({
         variables: {
           filter: { id: { eq: editingId } },
@@ -501,6 +487,34 @@ export function Layout() {
           toast.error('Failed to update prompt');
         },
       });
+      return;
+    }
+
+    // Creating a new prompt: require both model responses and a completed run.
+    // Supabase GraphQL `JSON` inputs can be finicky; in practice, sending a JSON string
+    // is the most compatible format. We intentionally omit created_at/updated_at.
+    const modelResponsesForSave = (() => {
+      const requiredModelIds = ['llama-3.1-8b-instant', googleSelectedModelId] as const;
+
+      const byModelId = new Map(
+        modelResponses.map((r) => [normalizeModelId(r.model_id), r] as const)
+      );
+
+      const out: Array<{ model_id: string; response: string }> = [];
+
+      for (const uiModelId of requiredModelIds) {
+        const r = byModelId.get(uiModelId);
+        if (!r || r.status !== 'done' || !r.response.trim()) return null;
+
+        // Store the full model id in the JSON column (not the winner enum).
+        out.push({ model_id: uiModelId, response: r.response });
+      }
+
+      return JSON.stringify(out);
+    })();
+
+    if (!modelResponsesForSave) {
+      toast.error('Run both models and wait for completion before saving');
       return;
     }
 
@@ -568,12 +582,21 @@ export function Layout() {
     setInstructions(prompt.instructions);
     setWinner(prompt.winner);
     setLastSaved({ title: prompt.title, instructions: prompt.instructions, winner: prompt.winner });
-    setModelResponses(
-      prompt.modelResponses.map((r) => ({
-        ...r,
-        model_id: normalizeModelId(r.model_id),
-      }))
-    );
+    const normalized = prompt.modelResponses.map((r) => ({
+      ...r,
+      model_id: normalizeModelId(r.model_id),
+    }));
+    setModelResponses(normalized);
+
+    // Align the Google dropdown to the loaded prompt's Google model id (if present).
+    const googleModelId = normalized.find((r) => r.model_id.startsWith('gemini-'))?.model_id;
+    if (
+      googleModelId &&
+      googleModelOptions.some((opt) => opt.id === googleModelId) &&
+      googleModelId !== googleSelectedModelId
+    ) {
+      setGoogleSelectedModelId(googleModelId);
+    }
   }
 
   const openSidebar = useCallback(() => {
