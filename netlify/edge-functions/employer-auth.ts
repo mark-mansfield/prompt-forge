@@ -114,10 +114,12 @@ function corsHeadersForRequest(request: Request): {
 
   const origin = request.headers.get('Origin');
   if (!origin) {
-    // Require an explicit Origin header so that all requests are subject to the
-    // EMPLOYER_ALLOWED_ORIGINS allow-list. Non-browser clients must send Origin
-    // explicitly if they need CORS access.
-    return { headers, allowed: false };
+    // Browsers can omit Origin for same-origin GET requests. We only allow
+    // this in localhost dev to keep production strict.
+    const url = new URL(request.url);
+    const host = url.hostname;
+    const isLocalhost = host === 'localhost' || host === '127.0.0.1' || host === '::1';
+    return { headers, allowed: isLocalhost };
   }
 
   const allowedOrigins = getAllowedOrigins();
