@@ -1,9 +1,19 @@
-export type Winner = 'llama' | 'qwen';
+export type Winner = 'llama' | 'gemini';
 
 export type SavedModelResponse = {
   model_id: string;
   response: string;
   created_at?: string;
+  /**
+   * UI-only fields for streaming runs (not persisted today).
+   */
+  status?: 'idle' | 'streaming' | 'done' | 'error' | 'aborted';
+  error?: string;
+  usage?: {
+    totalTokens?: number;
+    inputTokens?: number;
+    outputTokens?: number;
+  };
 };
 
 /**

@@ -5,6 +5,10 @@ publish = "dist"
 # Use the conventional Edge Functions directory.
 edge_functions = "netlify/edge-functions"
 
+[functions]
+# Use the conventional Netlify Functions directory (Node runtime).
+directory = "netlify/functions"
+
 [dev]
 # Serve the site at 5173 so it matches common Supabase CORS configs,
 # while Vite runs behind the scenes on 5174.

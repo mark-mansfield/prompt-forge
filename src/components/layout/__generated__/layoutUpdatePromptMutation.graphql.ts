@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<e2670cfbdf11df18bc56b491a0703fb1>>
+ * @generated SignedSource<<c3165af72fa2b5c4fa33a94b78b32c89>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -10,7 +10,7 @@
 
 import { ConcreteRequest } from 'relay-runtime';
 export type FilterIs = "NOT_NULL" | "NULL" | "%future added value";
-export type winner_model = "llama" | "qwen" | "%future added value";
+export type winner_model_enum = "gemini" | "llama" | "%future added value";
 export type saved_promptsFilter = {
   and?: ReadonlyArray<saved_promptsFilter> | null | undefined;
   created_at?: DatetimeFilter | null | undefined;
@@ -22,7 +22,7 @@ export type saved_promptsFilter = {
   or?: ReadonlyArray<saved_promptsFilter> | null | undefined;
   title?: StringFilter | null | undefined;
   updated_at?: DatetimeFilter | null | undefined;
-  winner?: winner_modelFilter | null | undefined;
+  winner?: winner_model_enumFilter | null | undefined;
 };
 export type UUIDFilter = {
   eq?: any | null | undefined;
@@ -45,11 +45,11 @@ export type StringFilter = {
   regex?: string | null | undefined;
   startsWith?: string | null | undefined;
 };
-export type winner_modelFilter = {
-  eq?: winner_model | null | undefined;
-  in?: ReadonlyArray<winner_model> | null | undefined;
+export type winner_model_enumFilter = {
+  eq?: winner_model_enum | null | undefined;
+  in?: ReadonlyArray<winner_model_enum> | null | undefined;
   is?: FilterIs | null | undefined;
-  neq?: winner_model | null | undefined;
+  neq?: winner_model_enum | null | undefined;
 };
 export type DatetimeFilter = {
   eq?: any | null | undefined;
@@ -72,7 +72,7 @@ export type saved_promptsUpdateInput = {
   model_responses?: any | null | undefined;
   title?: string | null | undefined;
   updated_at?: any | null | undefined;
-  winner?: winner_model | null | undefined;
+  winner?: winner_model_enum | null | undefined;
 };
 export type layoutUpdatePromptMutation$variables = {
   filter: saved_promptsFilter;
@@ -85,7 +85,7 @@ export type layoutUpdatePromptMutation$data = {
       readonly id: any;
       readonly instructions: string;
       readonly title: string;
-      readonly winner: winner_model;
+      readonly winner: winner_model_enum;
     }>;
   };
 };

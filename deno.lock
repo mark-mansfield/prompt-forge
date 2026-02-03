@@ -11,6 +11,8 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
+        "npm:@ai-sdk/google@^3.0.18",
+        "npm:@ai-sdk/groq@^3.0.19",
         "npm:@eslint/js@^9.39.2",
         "npm:@tailwindcss/vite@^4.1.18",
         "npm:@types/node@^24.10.1",
@@ -21,6 +23,7 @@
         "npm:@typescript-eslint/eslint-plugin@^8.53.1",
         "npm:@typescript-eslint/parser@^8.53.1",
         "npm:@vitejs/plugin-react@^5.1.1",
+        "npm:ai@^6.0.64",
         "npm:babel-plugin-react-compiler@1",
         "npm:babel-plugin-relay@^20.1.1",
         "npm:eslint-config-prettier@^10.1.8",

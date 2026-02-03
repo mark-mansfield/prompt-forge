@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<49acb486b502294e264d6c2461f4c936>>
+ * @generated SignedSource<<5f1572c8f1447c272a667368e5921d78>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,7 +9,7 @@
 // @ts-nocheck
 
 import { ConcreteRequest } from 'relay-runtime';
-export type winner_model = "llama" | "qwen" | "%future added value";
+export type winner_model_enum = "gemini" | "llama" | "%future added value";
 export type saved_promptsInsertInput = {
   created_at?: any | null | undefined;
   icon?: string | null | undefined;
@@ -18,7 +18,7 @@ export type saved_promptsInsertInput = {
   model_responses?: any | null | undefined;
   title?: string | null | undefined;
   updated_at?: any | null | undefined;
-  winner?: winner_model | null | undefined;
+  winner?: winner_model_enum | null | undefined;
 };
 export type layoutSavePromptMutation$variables = {
   object: saved_promptsInsertInput;
@@ -30,7 +30,7 @@ export type layoutSavePromptMutation$data = {
       readonly id: any;
       readonly instructions: string;
       readonly title: string;
-      readonly winner: winner_model;
+      readonly winner: winner_model_enum;
     }>;
   } | null | undefined;
 };

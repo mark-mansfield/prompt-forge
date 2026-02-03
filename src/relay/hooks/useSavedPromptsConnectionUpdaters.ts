@@ -3,7 +3,7 @@ import { ConnectionHandler, type RecordSourceSelectorProxy } from 'relay-runtime
 
 const SAVED_PROMPTS_CONNECTION_KEY = 'Layout__saved_promptsCollection';
 
-type Winner = 'llama' | 'qwen';
+type Winner = 'llama' | 'gemini';
 
 type PromptPatch = {
   title: string;

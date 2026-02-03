@@ -32,11 +32,23 @@ export function Sidebar({ promptNodesRef, handleLoadPrompt }: Props) {
   const { activeTabId } = useLazyLoadQuery<SidebarActiveTabQueryType>(sidebarActiveTabQuery, {});
   const prompts = useFragment(sidebarPromptsFragment, promptNodesRef);
 
+  const winnerToModelId = (winner: string) => {
+    if (winner === 'llama') return 'llama-3.1-8b-instant';
+    if (winner === 'gemini') return 'gemini-2.5-flash';
+    return winner;
+  };
+
+  // NOTE: Tabs *appear* model-id keyed (`llama-3.1-8b-instant`, `gemini-2.5-flash`),
+  // but filtering is effectively *provider-level* via `winner` (mapped by `winnerToModelId`).
+  // This means all Gemini winners (including different Google model variants like Flash/Flash‑Lite)
+  // show up under the single "Gemini" tab.
   const visiblePrompts =
-    activeTabId === 'all' ? prompts : prompts.filter((p) => p.winner === activeTabId);
+    activeTabId === 'all'
+      ? prompts
+      : prompts.filter((p) => winnerToModelId(String(p.winner)) === activeTabId);
 
   return (
-    <aside className="w-full md:w-68 border-r border-slate-700 flex flex-col overflow-y-auto">
+    <aside className="w-full h-full md:w-68 border-r border-slate-700 flex flex-col overflow-y-auto">
       <div className="sticky top-0 z-50 bg-slate-900">
         <div className="p-4 flex items-center gap-2 border-b border-slate-700">
           <AnvilIcon size={24} />
