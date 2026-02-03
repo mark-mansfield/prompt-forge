@@ -405,7 +405,7 @@ export function Layout() {
       results.forEach((r, idx) => {
         if (r.status !== 'rejected') return;
         const provider = providers[idx];
-        const modelId = providerToModelId[provider];
+        const modelId = provider === 'google' ? googleSelectedModelId : providerToModelId[provider];
         const msg = r.reason instanceof Error ? r.reason.message : String(r.reason);
         setModelResponses((prev) =>
           prev.map((mr) => (mr.model_id === modelId ? { ...mr, status: 'error', error: msg } : mr))
