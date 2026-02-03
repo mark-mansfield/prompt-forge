@@ -127,13 +127,9 @@ export function Layout() {
   );
 
   function applyModifier(type: ModifierType): 'added' | 'removed' {
-    let action: 'added' | 'removed' = 'added';
-    setInstructions((prev) => {
-      const result = toggleModifierInText(prev, type);
-      action = result.action;
-      return result.nextText;
-    });
-    return action;
+    const result = toggleModifierInText(instructions, type);
+    setInstructions(result.nextText);
+    return result.action;
   }
 
   function handleWinner(winnerEnum: 'llama' | 'gemini') {
