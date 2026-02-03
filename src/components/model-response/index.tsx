@@ -51,7 +51,7 @@ export const ModelResponse = ({
       : null;
 
   return (
-    <div className="border-r border-slate-700 flex flex-col">
+    <div className="border-r border-slate-700 flex flex-col h-full">
       <div className="p-3 border-b border-slate-700">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0 h-10">
@@ -87,7 +87,7 @@ export const ModelResponse = ({
           </div>
         </div>
       </div>
-      <div className="flex-1 p-4 overflow-y-auto text-sm text-slate-300 whitespace-pre-wrap">
+      <div className="flex-1 p-4 text-sm text-slate-300 whitespace-pre-wrap">
         {error ? (
           <div className="mb-3">
             <div className="text-sm text-red-300 whitespace-pre-wrap">{error}</div>
