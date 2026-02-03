@@ -747,7 +747,7 @@ export function Layout() {
                     : undefined
                 }
                 winnerButton={
-                  canPickWinner && winnerEnum ? (
+                  canPickWinner ? (
                     <WinnerButton
                       label={modelId}
                       onClick={() => handleWinner(winnerEnum)}
