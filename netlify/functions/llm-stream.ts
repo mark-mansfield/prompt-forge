@@ -136,7 +136,7 @@ function sseHeaders(extra?: Record<string, string>): Headers {
     'cache-control': 'no-store',
     // Some proxy setups buffer/compress streams; explicitly disabling can help.
     // (AI SDK docs: "streaming not working when proxied")
-    'content-encoding': 'none',
+    'Content-Encoding': 'identity',
     // Required for the AI SDK UI data stream protocol.
     'x-vercel-ai-ui-message-stream': 'v1',
     ...(extra ?? {}),
@@ -270,7 +270,7 @@ export default async function handler(req: Request, context: unknown): Promise<R
       headers: {
         ...corsHeaders,
         // Prevent buffering/compression issues in some proxy environments.
-        'Content-Encoding': 'none',
+        'Content-Encoding': 'identity',
         'Cache-Control': 'no-store',
       },
       // Attach usage and provenance as message-level metadata.
