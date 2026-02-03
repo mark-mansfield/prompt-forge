@@ -12,7 +12,8 @@
     "format": "prettier --write src/",
     "preview": "vite preview",
     "relay": "relay-compiler",
-    "get-schema": "node --env-file=.env ./scripts/fetch-schema.js"
+    "get-schema": "node --env-file=.env ./scripts/fetch-schema.js",
+    "deploy-prod": "netlify deploy --prod"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.18",
