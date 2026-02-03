@@ -395,12 +395,6 @@ export function Layout() {
           (r.status === 'fulfilled' && !r.value.finishedOk && !r.value.aborted)
       );
 
-      results.forEach((r) => {
-        if (r.status === 'rejected') {
-          console.error('LLM stream failed:', r.reason);
-        }
-      });
-
       // Mark per-panel errors (so the UI shows them inline).
       results.forEach((r, idx) => {
         if (r.status !== 'rejected') return;
@@ -410,6 +404,7 @@ export function Layout() {
         setModelResponses((prev) =>
           prev.map((mr) => (mr.model_id === modelId ? { ...mr, status: 'error', error: msg } : mr))
         );
+        console.error('LLM stream failed:', r.reason);
       });
 
       // Only toast on *actual* failures. Successful runs should be silent,
@@ -658,7 +653,7 @@ export function Layout() {
         />
 
         {/* Model Responses - Side by Side */}
-        <section className="grid grid-cols-2 items-stretch min-h-screen">
+        <section className="grid grid-cols-2 items-stretch flex-1">
           {modelResponses.map((r, idx) => {
             const modelId = normalizeModelId(r.model_id);
             const key = `${modelId}-${r.created_at ?? idx}`;
