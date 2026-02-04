@@ -1,5 +1,5 @@
 import { useRelayEnvironment } from 'react-relay';
-import { setActiveTabId } from '../../../relay/ui-state';
+import { setActiveTabId } from '../../../utils/ui-state';
 type Tab = {
   id: string;
   shortName: string;

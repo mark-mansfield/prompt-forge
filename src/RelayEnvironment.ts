@@ -7,7 +7,7 @@ import {
   type Variables,
 } from 'relay-runtime';
 
-import { setActiveTabId } from './relay/ui-state';
+import { setActiveTabId } from './utils/ui-state';
 
 async function fetchQuery(params: RequestParameters, variables: Variables) {
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
