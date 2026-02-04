@@ -13,7 +13,8 @@
     "preview": "vite preview",
     "relay": "relay-compiler",
     "get-schema": "node --env-file=.env ./scripts/fetch-schema.js",
-    "deploy-prod": "netlify deploy --prod"
+    "deploy-prod": "netlify deploy --prod",
+    "test": "vitest"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.18",
@@ -55,6 +56,7 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.53.1",
     "vite": "^7.2.4",
-    "vite-plugin-relay": "^2.1.0"
+    "vite-plugin-relay": "^2.1.0",
+    "vitest": "^4.0.18"
   }
 }
