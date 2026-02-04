@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import handler from '../employer-auth';
+import handler from '../../edge-functions/employer-auth';
+import { makeRequest } from '../utils/test-utils';
 
 const ALLOWED_ORIGIN = 'https://allowed.example';
 
@@ -26,32 +27,6 @@ async function readJson<T = unknown>(res: Response): Promise<T> {
   return (await res.json()) as T;
 }
 
-function makeRequest(opts: {
-  method: string;
-  url?: string;
-  origin?: string;
-  cookie?: string;
-  jsonBody?: unknown;
-  rawBody?: string;
-  contentType?: string;
-}): Request {
-  const url = opts.url ?? 'https://app.example/auth/employer';
-  const headers = new Headers();
-  if (opts.origin) headers.set('Origin', opts.origin);
-  if (opts.cookie) headers.set('Cookie', opts.cookie);
-
-  let body: BodyInit | undefined;
-  if (opts.rawBody !== undefined) {
-    body = opts.rawBody;
-    headers.set('Content-Type', opts.contentType ?? 'application/json');
-  } else if (opts.jsonBody !== undefined) {
-    body = JSON.stringify(opts.jsonBody);
-    headers.set('Content-Type', 'application/json');
-  }
-
-  return new Request(url, { method: opts.method, headers, body });
-}
-
 function extractCookieValue(setCookie: string, name: string): string | null {
   // Example: "pf_employer_session=AAA.BBB; Path=/; Max-Age=86400; HttpOnly; SameSite=Strict; Secure"
   const prefix = `${name}=`;
@@ -71,14 +46,22 @@ describe('netlify edge function employer-auth', () => {
   });
 
   it('returns 204 for allowed CORS preflight OPTIONS', async () => {
-    const req = makeRequest({ method: 'OPTIONS', origin: ALLOWED_ORIGIN });
+    const req = makeRequest({
+      method: 'OPTIONS',
+      origin: ALLOWED_ORIGIN,
+      url: 'https://app.example/auth/employer',
+    });
     const res = await handler(req);
     expect(res.status).toBe(204);
     expect(res.headers.get('Access-Control-Allow-Methods')).toContain('OPTIONS');
   });
 
   it('blocks preflight OPTIONS for disallowed origin', async () => {
-    const req = makeRequest({ method: 'OPTIONS', origin: 'https://evil.example' });
+    const req = makeRequest({
+      method: 'OPTIONS',
+      origin: 'https://evil.example',
+      url: 'https://app.example/auth/employer',
+    });
     const res = await handler(req);
     expect(res.status).toBe(403);
     const body = await readJson(res);
@@ -86,7 +69,11 @@ describe('netlify edge function employer-auth', () => {
   });
 
   it('blocks GET for disallowed origin', async () => {
-    const req = makeRequest({ method: 'GET', origin: 'https://evil.example' });
+    const req = makeRequest({
+      method: 'GET',
+      origin: 'https://evil.example',
+      url: 'https://app.example/auth/employer',
+    });
     const res = await handler(req);
     expect(res.status).toBe(403);
     const body = await readJson(res);
@@ -105,7 +92,11 @@ describe('netlify edge function employer-auth', () => {
   });
 
   it('GET returns authorized false when no cookie present', async () => {
-    const req = makeRequest({ method: 'GET', origin: ALLOWED_ORIGIN });
+    const req = makeRequest({
+      method: 'GET',
+      origin: ALLOWED_ORIGIN,
+      url: 'https://app.example/auth/employer',
+    });
     const res = await handler(req);
     expect(res.status).toBe(200);
     expect(res.headers.get('Access-Control-Allow-Origin')).toBe(ALLOWED_ORIGIN);
@@ -114,14 +105,24 @@ describe('netlify edge function employer-auth', () => {
   });
 
   it('POST rejects invalid JSON', async () => {
-    const req = makeRequest({ method: 'POST', origin: ALLOWED_ORIGIN, rawBody: '{not json' });
+    const req = makeRequest({
+      method: 'POST',
+      origin: ALLOWED_ORIGIN,
+      rawBody: '{not json',
+      url: 'https://app.example/auth/employer',
+    });
     const res = await handler(req);
     expect(res.status).toBe(400);
     expect(await readJson(res)).toEqual({ error: 'Invalid JSON' });
   });
 
   it('POST requires password', async () => {
-    const req = makeRequest({ method: 'POST', origin: ALLOWED_ORIGIN, jsonBody: {} });
+    const req = makeRequest({
+      method: 'POST',
+      origin: ALLOWED_ORIGIN,
+      jsonBody: {},
+      url: 'https://app.example/auth/employer',
+    });
     const res = await handler(req);
     expect(res.status).toBe(400);
     expect(await readJson(res)).toEqual({ error: 'Password required' });
@@ -132,6 +133,7 @@ describe('netlify edge function employer-auth', () => {
       method: 'POST',
       origin: ALLOWED_ORIGIN,
       jsonBody: { password: 'wrong-password' },
+      url: 'https://app.example/auth/employer',
     });
     const res = await handler(req);
     expect(res.status).toBe(401);
@@ -163,6 +165,7 @@ describe('netlify edge function employer-auth', () => {
       method: 'GET',
       origin: ALLOWED_ORIGIN,
       cookie: `pf_employer_session=${token}`,
+      url: 'https://app.example/auth/employer',
     });
     const getRes = await handler(getReq);
     expect(getRes.status).toBe(200);
@@ -189,6 +192,7 @@ describe('netlify edge function employer-auth', () => {
         method: 'POST',
         origin: ALLOWED_ORIGIN,
         jsonBody: { password: 'correct-password' },
+        url: 'https://app.example/auth/employer',
       })
     );
     const setCookie = loginRes.headers.get('Set-Cookie');
@@ -199,6 +203,7 @@ describe('netlify edge function employer-auth', () => {
         method: 'POST',
         origin: ALLOWED_ORIGIN,
         cookie: `pf_employer_session=${token}`,
+        url: 'https://app.example/auth/employer',
         // no body
       })
     );
@@ -212,6 +217,7 @@ describe('netlify edge function employer-auth', () => {
         method: 'POST',
         origin: ALLOWED_ORIGIN,
         jsonBody: { password: 'correct-password' },
+        url: 'https://app.example/auth/employer',
       })
     );
     const setCookie = loginRes.headers.get('Set-Cookie');
@@ -228,6 +234,7 @@ describe('netlify edge function employer-auth', () => {
         method: 'GET',
         origin: ALLOWED_ORIGIN,
         cookie: `pf_employer_session=${tampered}`,
+        url: 'https://app.example/auth/employer',
       })
     );
     expect(res.status).toBe(200);
@@ -246,6 +253,7 @@ describe('netlify edge function employer-auth', () => {
         method: 'POST',
         origin: ALLOWED_ORIGIN,
         jsonBody: { password: 'correct-password' },
+        url: 'https://app.example/auth/employer',
       })
     );
     const token = extractCookieValue(loginRes.headers.get('Set-Cookie')!, 'pf_employer_session')!;
@@ -261,6 +269,7 @@ describe('netlify edge function employer-auth', () => {
         method: 'GET',
         origin: ALLOWED_ORIGIN,
         cookie: `pf_employer_session=${token}`,
+        url: 'https://app.example/auth/employer',
       })
     );
     expect(res.status).toBe(200);
@@ -277,6 +286,7 @@ describe('netlify edge function employer-auth', () => {
         method: 'POST',
         origin: ALLOWED_ORIGIN,
         jsonBody: { password: 'correct-password' },
+        url: 'https://app.example/auth/employer',
       })
     );
     const token = extractCookieValue(loginRes.headers.get('Set-Cookie')!, 'pf_employer_session')!;
@@ -289,6 +299,7 @@ describe('netlify edge function employer-auth', () => {
         method: 'GET',
         origin: ALLOWED_ORIGIN,
         cookie: `pf_employer_session=${token}`,
+        url: 'https://app.example/auth/employer',
       })
     );
     expect(res.status).toBe(200);
