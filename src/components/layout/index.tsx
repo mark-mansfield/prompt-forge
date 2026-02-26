@@ -13,7 +13,7 @@ import type { layoutSavePromptMutation } from './__generated__/layoutSavePromptM
 import type { layoutUpdatePromptMutation } from './__generated__/layoutUpdatePromptMutation.graphql';
 import type { layoutDeletePromptMutation } from './__generated__/layoutDeletePromptMutation.graphql';
 import { toast } from 'sonner';
-import { SidebarWithSheet } from '../sidebar/SidebarWithSheet';
+import { SidebarWithSheet } from '../sidebar';
 import type { ModifierType } from '../../utils/modifier-tools';
 import { detectActiveModifiers, toggleModifierInText, MODIFIERS } from '../../utils/modifier-tools';
 

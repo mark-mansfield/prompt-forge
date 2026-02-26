@@ -30,11 +30,7 @@ const GOOGLE_FLASH_LITE_MODEL_ID = 'gemini-2.5-flash-lite';
 type SessionPayload = { exp: number; iat: number };
 
 function base64UrlDecodeToBytes(input: string): Buffer {
-  const padded = input
-    .replace(/-/g, '+')
-    .replace(/_/g, '/')
-    .padEnd(Math.ceil(input.length / 4) * 4, '=');
-  return Buffer.from(padded, 'base64');
+  return Buffer.from(input, 'base64');
 }
 
 function timingSafeEqual(a: Buffer, b: Buffer): boolean {
