@@ -49,7 +49,7 @@ function timingSafeEqual(a: Buffer, b: Buffer): boolean {
 }
 
 function verifySessionToken(token: string): boolean {
-  const secret = process.env.EMPLOYER_SESSION_SECRET ?? '';
+  const secret = process.env.GATE_SESSION_SECRET ?? '';
   if (!secret) return false;
 
   const [payloadB64, sigB64, ...rest] = token.split('.');
@@ -80,7 +80,7 @@ function verifySessionToken(token: string): boolean {
 }
 
 function getAllowedOrigins(): Set<string> {
-  const raw = process.env.LLM_ALLOWED_ORIGINS ?? process.env.EMPLOYER_ALLOWED_ORIGINS ?? '';
+  const raw = process.env.LLM_ALLOWED_ORIGINS ?? process.env.GATE_ALLOWED_ORIGINS ?? '';
   return new Set(
     raw
       .split(',')

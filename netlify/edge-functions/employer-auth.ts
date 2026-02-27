@@ -5,9 +5,9 @@
 // - GET: verifies cookie -> { authorized: boolean }
 //
 // Env vars:
-// - EMPLOYER_PASSWORD: password required for POST
-// - EMPLOYER_SESSION_SECRET: HMAC secret used to sign cookies (required)
-// - EMPLOYER_ALLOWED_ORIGINS: comma-separated list of allowed Origins for CORS
+// - GATE_PASSWORD: password required for POST
+// - GATE_SESSION_SECRET: HMAC secret used to sign cookies (required)
+// - GATE_ALLOWED_ORIGINS: comma-separated list of allowed Origins for CORS
 //   (e.g. "http://localhost:8888,https://your-site.netlify.app")
 
 type AuthPayload = {
@@ -39,7 +39,7 @@ function getEnv(name: string): string | undefined {
   // If neither Netlify.env nor Deno.env is available, this runtime cannot
   // access environment variables at all. Fail explicitly rather than
   // silently returning undefined, since required secrets (e.g.
-  // EMPLOYER_SESSION_SECRET) would be missing.
+  // GATE_SESSION_SECRET) would be missing.
   if (!hasNetlifyEnv && !hasDenoEnv) {
     // Use console.error for visibility in logs without introducing
     // any additional dependencies.
@@ -95,7 +95,7 @@ function parseCookies(cookieHeader: string | null): Record<string, string> {
 }
 
 function getAllowedOrigins(): Set<string> {
-  const raw = getEnv('EMPLOYER_ALLOWED_ORIGINS') ?? '';
+  const raw = getEnv('GATE_ALLOWED_ORIGINS') ?? '';
   return new Set(
     raw
       .split(',')
@@ -134,9 +134,9 @@ function corsHeadersForRequest(request: Request): {
 }
 
 async function getHmacKey(): Promise<CryptoKey> {
-  const secret = getEnv('EMPLOYER_SESSION_SECRET') ?? '';
+  const secret = getEnv('GATE_SESSION_SECRET') ?? '';
   if (!secret) {
-    throw new Error('Missing EMPLOYER_SESSION_SECRET');
+    throw new Error('Missing GATE_SESSION_SECRET');
   }
 
   if (cachedKey && cachedSecret === secret) return cachedKey;
@@ -247,7 +247,7 @@ export default async (request: Request) => {
       return jsonResponse({ error: 'Password required' }, { status: 400, headers: cors.headers });
     }
 
-    const expectedPassword = getEnv('EMPLOYER_PASSWORD');
+    const expectedPassword = getEnv('GATE_PASSWORD');
     if (!expectedPassword || password !== expectedPassword) {
       return jsonResponse({ error: 'Invalid password' }, { status: 401, headers: cors.headers });
     }
