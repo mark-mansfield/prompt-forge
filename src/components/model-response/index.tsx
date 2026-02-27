@@ -91,8 +91,11 @@ export const ModelResponse = ({
       </div>
       <div className="flex-1 p-4 text-sm text-slate-300 whitespace-pre-wrap">
         {error ? (
-          <div className="mb-3">
-            <div className="text-sm text-red-300 whitespace-pre-wrap">{error}</div>
+          <div className="mb-3 space-y-1">
+            <div className="text-sm text-red-300">Something went wrong.</div>
+            <div className="text-xs text-slate-400">
+              Try switching models or running the prompt again.
+            </div>
           </div>
         ) : null}
 
