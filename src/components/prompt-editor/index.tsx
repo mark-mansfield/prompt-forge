@@ -1,9 +1,18 @@
 import { Save, Play, Trash2, Sparkles, Target, MessageSquare, CircleX, Square } from 'lucide-react';
 import { useState } from 'react';
+import { useForm } from '@tanstack/react-form';
+import * as z from 'zod';
 
 import { Button } from '../ui/button';
+import { Field, FieldError, FieldGroup, FieldLabel } from '../ui/field';
+import { Textarea } from '../ui/textarea';
 import { PromptEditorHeader } from './header';
 import type { DraftPrompt } from '../layout/types';
+
+const promptSchema = z.object({
+  title: z.string(),
+  instructions: z.string(),
+});
 
 type ModifierType = 'clear' | 'quality' | 'tone';
 type ModifierAction = 'added' | 'removed';
@@ -41,9 +50,19 @@ export const PromptEditor = ({
   setTitle: (title: string) => void;
   setInstructions: (instructions: string) => void;
 }) => {
-  const { title, instructions } = prompt;
+  const { instructions } = prompt;
   const [modifierAnnouncement, setModifierAnnouncement] = useState('');
   const activeSet = new Set(activeModifiers ?? []);
+
+  const form = useForm({
+    defaultValues: {
+      title: prompt.title,
+      instructions: prompt.instructions ?? '',
+    },
+    validators: {
+      onBlur: promptSchema,
+    },
+  });
 
   const announceModifier = (type: ModifierType) => {
     const action = applyModifier(type);
@@ -160,21 +179,99 @@ export const PromptEditor = ({
           Tone
         </Button>
       </div>
-      <input
-        type="text"
-        placeholder="Prompt title..."
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="w-full p-3 mb-3 bg-slate-800 border border-slate-700 rounded text-white placeholder-slate-500 focus:outline-none focus:border-slate-600 font-medium"
-      />
       <div className="flex flex-col gap-4 py-2">
-        <textarea
-          placeholder="Enter your prompt here..."
-          rows={6}
-          value={instructions || ''}
-          onChange={(e) => setInstructions(e.target.value)}
-          className="flex-1 min-h-32 w-full p-3 bg-slate-800 border border-slate-700 rounded text-white placeholder-slate-500 resize-y focus:outline-none focus:border-slate-600"
-        />
+        <FieldGroup className="gap-4">
+          <form.Field
+            name="title"
+            children={(field) => {
+              const errors = field.state.meta.errors;
+              const isInvalid =
+                field.state.meta.isTouched &&
+                Array.isArray(errors) &&
+                errors.length > 0;
+              const errorMessages = Array.isArray(errors)
+                ? errors
+                    .map((e) =>
+                      e != null && typeof e === 'object' && 'message' in e
+                        ? { message: (e as { message?: string }).message }
+                        : e != null
+                          ? { message: String(e) }
+                          : undefined
+                    )
+                    .filter(Boolean)
+                : undefined;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name} className="sr-only">
+                    Prompt title
+                  </FieldLabel>
+                  <input
+                    id={field.name}
+                    type="text"
+                    placeholder="Prompt title..."
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      field.handleChange(v);
+                      setTitle(v);
+                    }}
+                    className="w-full p-3 mb-3 bg-slate-800 border border-slate-700 rounded text-white placeholder-slate-500 focus:outline-none focus:border-slate-600 font-medium"
+                    aria-invalid={isInvalid}
+                  />
+                  {isInvalid && errorMessages && (
+                    <FieldError errors={errorMessages} />
+                  )}
+                </Field>
+              );
+            }}
+          />
+          <form.Field
+            name="instructions"
+            children={(field) => {
+              const errors = field.state.meta.errors;
+              const isInvalid =
+                field.state.meta.isTouched &&
+                Array.isArray(errors) &&
+                errors.length > 0;
+              const errorMessages = Array.isArray(errors)
+                ? errors
+                    .map((e) =>
+                      e != null && typeof e === 'object' && 'message' in e
+                        ? { message: (e as { message?: string }).message }
+                        : e != null
+                          ? { message: String(e) }
+                          : undefined
+                    )
+                    .filter(Boolean)
+                : undefined;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name} className="sr-only">
+                    Prompt details
+                  </FieldLabel>
+                  <Textarea
+                    id={field.name}
+                    placeholder="Enter your prompt here..."
+                    rows={6}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      field.handleChange(v);
+                      setInstructions(v);
+                    }}
+                    className="flex-1 min-h-32 w-full resize-y bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:border-slate-600 focus-visible:ring-slate-600"
+                    aria-invalid={isInvalid}
+                  />
+                  {isInvalid && errorMessages && (
+                    <FieldError errors={errorMessages} />
+                  )}
+                </Field>
+              );
+            }}
+          />
+        </FieldGroup>
 
         <div className="w-full flex gap-2 justify-end">
           <Button

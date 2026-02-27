@@ -639,6 +639,7 @@ export function Layout() {
 
       <main className="flex-1 flex flex-col">
         <PromptEditor
+          key={editingId ?? 'new'}
           prompt={{
             title,
             instructions,
