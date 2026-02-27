@@ -1,5 +1,15 @@
-import { Save, Play, Trash2, Sparkles, Target, MessageSquare, CircleX, Square, Plus } from 'lucide-react';
-import { useState } from 'react';
+import {
+  Save,
+  Play,
+  Trash2,
+  Sparkles,
+  Target,
+  MessageSquare,
+  CircleX,
+  Square,
+  Plus,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useForm } from '@tanstack/react-form';
 import * as z from 'zod';
 
@@ -64,6 +74,12 @@ export const PromptEditor = ({
     },
   });
 
+  // Sync parent state into form when it changes from outside (e.g. Clarity/Quality/Tone buttons)
+  useEffect(() => {
+    form.setFieldValue('title', prompt.title);
+    form.setFieldValue('instructions', prompt.instructions ?? '');
+  }, [prompt.title, prompt.instructions]);
+
   const announceModifier = (type: ModifierType) => {
     const action = applyModifier(type);
 
@@ -125,6 +141,7 @@ export const PromptEditor = ({
             aria-label="Clear prompt"
             title="Clear prompt"
             onClick={handleClear}
+            disabled={!instructions?.trim() || isLoading}
             className="bg-slate-700 hover:bg-slate-600 text-white"
           >
             <CircleX className="w-3 h-3" />
@@ -197,9 +214,7 @@ export const PromptEditor = ({
             children={(field) => {
               const errors = field.state.meta.errors;
               const isInvalid =
-                field.state.meta.isTouched &&
-                Array.isArray(errors) &&
-                errors.length > 0;
+                field.state.meta.isTouched && Array.isArray(errors) && errors.length > 0;
               const errorMessages = Array.isArray(errors)
                 ? errors
                     .map((e) =>
@@ -230,9 +245,7 @@ export const PromptEditor = ({
                     className="w-full p-3 mb-3 bg-slate-800 border border-slate-700 rounded text-white placeholder-slate-500 focus:outline-none focus:border-slate-600 font-medium"
                     aria-invalid={isInvalid}
                   />
-                  {isInvalid && errorMessages && (
-                    <FieldError errors={errorMessages} />
-                  )}
+                  {isInvalid && errorMessages && <FieldError errors={errorMessages} />}
                 </Field>
               );
             }}
@@ -242,9 +255,7 @@ export const PromptEditor = ({
             children={(field) => {
               const errors = field.state.meta.errors;
               const isInvalid =
-                field.state.meta.isTouched &&
-                Array.isArray(errors) &&
-                errors.length > 0;
+                field.state.meta.isTouched && Array.isArray(errors) && errors.length > 0;
               const errorMessages = Array.isArray(errors)
                 ? errors
                     .map((e) =>
@@ -264,7 +275,6 @@ export const PromptEditor = ({
                   <Textarea
                     id={field.name}
                     placeholder="Enter your prompt here..."
-                    rows={6}
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => {
@@ -272,12 +282,10 @@ export const PromptEditor = ({
                       field.handleChange(v);
                       setInstructions(v);
                     }}
-                    className="flex-1 min-h-32 w-full resize-y bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:border-slate-600 focus-visible:ring-slate-600"
+                    className="flex-1 w-full resize-y bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:border-slate-600 focus-visible:ring-slate-600"
                     aria-invalid={isInvalid}
                   />
-                  {isInvalid && errorMessages && (
-                    <FieldError errors={errorMessages} />
-                  )}
+                  {isInvalid && errorMessages && <FieldError errors={errorMessages} />}
                 </Field>
               );
             }}
