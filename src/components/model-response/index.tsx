@@ -47,7 +47,10 @@ export const ModelResponse = ({
         <div className="flex items-center justify-between gap-2">
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <div className="flex items-center gap-2 min-w-0">
-              <span className={`h-2 w-2 shrink-0 rounded-full ${dot}`} aria-hidden="true" />
+              <span
+                className={`h-2 w-2 shrink-0 rounded-full ${dot} ${status === 'streaming' ? 'animate-ping' : ''}`}
+                aria-hidden="true"
+              />
               <h3
                 className={`min-w-40 shrink-0 truncate rounded px-1 py-0.5 text-sm font-medium ${status === 'streaming' ? 'text-gradient text-transparent animate-gradient-text' : 'text-white'}`}
                 title={modelName}
@@ -56,9 +59,7 @@ export const ModelResponse = ({
               </h3>
               {headerInline ? <div className="shrink-0">{headerInline}</div> : null}
             </div>
-            {tokenLine ? (
-              <div className="pl-4 text-xs text-slate-500">{tokenLine}</div>
-            ) : null}
+            {tokenLine ? <div className="pl-4 text-xs text-slate-500">{tokenLine}</div> : null}
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {status === 'streaming' && onAbort ? (
