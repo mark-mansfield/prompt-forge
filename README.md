@@ -8,11 +8,8 @@ A/B testing tool for comparing LLM prompt responses side-by-side.
 - Vite
 - Tailwind CSS
 - React Relay (GraphQL)
-
-## Getting Started
-
 ### Prerequisites
-
+This repo assumes you are using netlify.
 - Netlify CLI (`npm install -g netlify-cli`)
 
 ### Installation
