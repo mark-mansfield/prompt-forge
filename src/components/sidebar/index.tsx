@@ -1,4 +1,5 @@
-import { AnvilIcon } from 'lucide-react';
+import { AnvilIcon, CheckIcon } from 'lucide-react';
+import { useState } from 'react';
 import type { Prompt } from '../layout/types';
 import { Button } from '../ui/button';
 import { useFragment, graphql, useLazyLoadQuery } from 'react-relay';
@@ -32,7 +33,7 @@ type Props = {
 export function Sidebar({ promptNodesRef, handleLoadPrompt }: Props) {
   const { activeTabId } = useLazyLoadQuery<SidebarActiveTabQueryType>(sidebarActiveTabQuery, {});
   const prompts = useFragment(sidebarPromptsFragment, promptNodesRef);
-
+  const [selectedPromptId, setSelectedPromptId] = useState<string | null>(null);
   const winnerToModelId = (winner: string) => {
     if (winner === 'llama') return 'llama-3.1-8b-instant';
     if (winner === 'gemini') return 'gemini-2.5-flash';
@@ -63,12 +64,16 @@ export function Sidebar({ promptNodesRef, handleLoadPrompt }: Props) {
           {visiblePrompts.map((p) => (
             <li key={p.id} className="text-sm text-slate-300 hover:text-white cursor-pointer">
               <Button
-                variant="ghost"
-                className="w-full justify-start gap-1 p-2 hover:bg-blue-500/30"
-                onClick={() => handleLoadPrompt(promptFromSidebarNode(p))}
+                variant={'ghost'}
+                className={`w-full justify-start gap-1 px-3 hover:bg-blue-500/30 text-white hover:text-white min-w-0 ${selectedPromptId === p.id ? 'bg-blue-500/30' : ''}`}
+                onClick={() => {
+                  handleLoadPrompt(promptFromSidebarNode(p));
+                  setSelectedPromptId(p.id);
+                }}
               >
-                <span className="w-4 h-4">{p.icon}</span>
-                <span className="text-sm">{p.title}</span>
+                <span className="w-4 h-4 shrink-0">{p.icon}</span>
+                <span className="text-sm truncate min-w-0">{p.title}</span>
+                {selectedPromptId === p.id && <CheckIcon className="shrink-0" />}
               </Button>
             </li>
           ))}

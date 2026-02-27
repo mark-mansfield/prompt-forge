@@ -151,6 +151,7 @@ export const PromptEditor = ({
             variant="default"
             size="sm"
             onClick={handleClear}
+            disabled={isLoading}
             className="bg-teal-600 hover:bg-teal-500 text-white shadow-md font-medium"
             aria-label="Create new prompt"
             title="Clear and start a new prompt"
@@ -275,6 +276,7 @@ export const PromptEditor = ({
                   <Textarea
                     id={field.name}
                     placeholder="Enter your prompt here..."
+                    rows={6}
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => {
@@ -282,7 +284,7 @@ export const PromptEditor = ({
                       field.handleChange(v);
                       setInstructions(v);
                     }}
-                    className="flex-1 w-full resize-y bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:border-slate-600 focus-visible:ring-slate-600"
+                    className="min-h-32 max-h-[66.67vh] w-full resize-y bg-slate-800 border-slate-700 text-white placeholder-slate-500 focus:border-slate-600 focus-visible:ring-slate-600"
                     aria-invalid={isInvalid}
                   />
                   {isInvalid && errorMessages && <FieldError errors={errorMessages} />}
