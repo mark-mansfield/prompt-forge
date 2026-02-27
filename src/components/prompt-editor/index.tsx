@@ -1,4 +1,4 @@
-import { Save, Play, Trash2, Sparkles, Target, MessageSquare, CircleX, Square } from 'lucide-react';
+import { Save, Play, Trash2, Sparkles, Target, MessageSquare, CircleX, Square, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
 import * as z from 'zod';
@@ -129,6 +129,17 @@ export const PromptEditor = ({
           >
             <CircleX className="w-3 h-3" />
             Clear
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleClear}
+            className="bg-teal-600 hover:bg-teal-500 text-white shadow-md font-medium"
+            aria-label="Create new prompt"
+            title="Clear and start a new prompt"
+          >
+            <Plus className="w-4 h-4" aria-hidden />
+            Create prompt
           </Button>
         </div>
       </div>
