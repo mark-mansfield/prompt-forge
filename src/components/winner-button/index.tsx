@@ -1,4 +1,6 @@
 import { Crown } from 'lucide-react';
+import { Button } from '../ui/button';
+
 export const WinnerButton = ({
   label,
   onClick,
@@ -9,8 +11,10 @@ export const WinnerButton = ({
   isWinner: boolean;
 }) => {
   return (
-    <button
-      className="p-4 font-bold text-lg w-full transition-all duration-200 bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center gap-2"
+    <Button
+      variant="outline"
+      size="lg"
+      className="rounded-none w-full font-bold text-lg p-4 transition-all duration-200 bg-white/10 hover:bg-white/20 border-white/20"
       onClick={onClick}
     >
       {isWinner ? (
@@ -21,6 +25,6 @@ export const WinnerButton = ({
       ) : (
         `Make ${label} Winner`
       )}
-    </button>
+    </Button>
   );
 };

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 
+import { Button } from '../ui/button';
 import { Sidebar } from './index';
 import type { Prompt } from '../layout/types';
 import type { sidebar_prompts_fragment$key } from './__generated__/sidebar_prompts_fragment.graphql';
@@ -71,15 +72,17 @@ export function SidebarWithSheet({
             className="absolute left-0 top-0 h-full w-[85vw] max-w-sm bg-slate-900 border-r border-slate-700 transform transition-transform duration-200 translate-x-0"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
+            <Button
               ref={closeButtonRef}
               type="button"
+              variant="ghost"
+              size="icon"
               aria-label="Close sidebar"
-              className="absolute right-3 top-3 z-50 p-2 rounded bg-slate-800/80 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="absolute right-3 top-3 z-50 bg-slate-800/80 hover:bg-slate-700 focus-visible:ring-2 focus-visible:ring-blue-500"
               onClick={close}
             >
               <X className="w-4 h-4" aria-hidden="true" />
-            </button>
+            </Button>
 
             <Sidebar
               promptNodesRef={sidebarProps.promptNodesRef}

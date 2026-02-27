@@ -1,3 +1,5 @@
+import { Button } from '../ui/button';
+
 export const ModelResponse = ({
   response,
   modelName,
@@ -34,17 +36,6 @@ export const ModelResponse = ({
             ? 'bg-green-400'
             : 'bg-slate-500';
 
-  const statusLabel =
-    status === 'error'
-      ? 'Error'
-      : status === 'aborted'
-        ? 'Cancelled'
-        : status === 'streaming'
-          ? 'Streaming'
-          : status === 'done'
-            ? 'Done'
-            : 'Idle';
-
   const tokenLine =
     usage?.totalTokens != null || usage?.inputTokens != null || usage?.outputTokens != null
       ? `Tokens: ${usage?.totalTokens ?? '—'} (in ${usage?.inputTokens ?? '—'} / out ${usage?.outputTokens ?? '—'})`
@@ -52,38 +43,48 @@ export const ModelResponse = ({
 
   return (
     <div className="border-r border-slate-700 flex flex-col h-full">
-      <div className="p-3 border-b border-slate-700">
+      <div className="border-b border-slate-700 p-3">
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0 h-10">
-            <span className={`w-2 h-2 ${dot} rounded-full`} aria-hidden="true" />
-            <h3 className="text-sm font-medium truncate">{modelName}</h3>
-            {headerInline ? <div className="shrink-0">{headerInline}</div> : null}
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className={`h-2 w-2 shrink-0 rounded-full ${dot}`} aria-hidden="true" />
+              <h3
+                className={`min-w-40 shrink-0 truncate rounded px-1 py-0.5 text-sm font-medium ${status === 'streaming' ? 'text-gradient text-transparent animate-gradient-text' : 'text-white'}`}
+                title={modelName}
+              >
+                {modelName}
+              </h3>
+              {headerInline ? <div className="shrink-0">{headerInline}</div> : null}
+            </div>
             {tokenLine ? (
-              <span className="text-xs text-slate-500 whitespace-nowrap">{tokenLine}</span>
+              <div className="pl-4 text-xs text-slate-500">{tokenLine}</div>
             ) : null}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             {status === 'streaming' && onAbort ? (
-              <button
+              <Button
                 type="button"
+                variant="secondary"
+                size="xs"
                 onClick={onAbort}
-                className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white"
+                className="bg-slate-700 hover:bg-slate-600"
                 title="Stop this stream"
               >
                 Stop
-              </button>
+              </Button>
             ) : null}
             {(status === 'error' || status === 'idle' || status === 'aborted') && onRetry ? (
-              <button
+              <Button
                 type="button"
+                variant="secondary"
+                size="xs"
                 onClick={onRetry}
-                className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs text-white"
+                className="bg-slate-700 hover:bg-slate-600"
                 title="Retry this model"
               >
                 Retry
-              </button>
+              </Button>
             ) : null}
-            <span className="text-xs text-slate-400">{statusLabel}</span>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { AnvilIcon } from 'lucide-react';
 import type { Prompt } from '../layout/types';
+import { Button } from '../ui/button';
 import { useFragment, graphql, useLazyLoadQuery } from 'react-relay';
 import type { sidebar_prompts_fragment$key } from './__generated__/sidebar_prompts_fragment.graphql';
 import type { sidebarActiveTabQuery as SidebarActiveTabQueryType } from './__generated__/sidebarActiveTabQuery.graphql';
@@ -61,13 +62,14 @@ export function Sidebar({ promptNodesRef, handleLoadPrompt }: Props) {
         <ul className="space-y-2">
           {visiblePrompts.map((p) => (
             <li key={p.id} className="text-sm text-slate-300 hover:text-white cursor-pointer">
-              <button
-                className="w-full flex gap-1 text-left p-2 rounded-md hover:bg-blue-500/30"
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-1 p-2 hover:bg-blue-500/30"
                 onClick={() => handleLoadPrompt(promptFromSidebarNode(p))}
               >
                 <span className="w-4 h-4">{p.icon}</span>
                 <span className="text-sm">{p.title}</span>
-              </button>
+              </Button>
             </li>
           ))}
         </ul>

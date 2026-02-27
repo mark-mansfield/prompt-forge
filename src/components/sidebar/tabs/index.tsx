@@ -1,5 +1,6 @@
 import { useRelayEnvironment } from 'react-relay';
 import { setActiveTabId } from '../../../relay/ui-state';
+import { Button } from '../../ui/button';
 type Tab = {
   id: string;
   shortName: string;
@@ -18,14 +19,16 @@ export const Tabs = ({ activeTabId }: { activeTabId: string }): React.ReactNode 
   return (
     <div className="border-b border-slate-700 pt-8 flex gap-2 px-4">
       {TABS.map((tab) => (
-        <button
+        <Button
           key={tab.id}
+          variant="ghost"
+          size="sm"
           title={tab.fullName ?? tab.shortName}
-          className={`text-sm font-medium text-slate-400 hover:text-white ${activeTabId === tab.id ? 'text-white border-b-2 border-blue-500' : 'border-b-2 border-transparent'}`}
+          className={`h-auto rounded-none border-b-2 px-0 pb-2 pt-0 text-slate-400 hover:bg-transparent hover:text-white ${activeTabId === tab.id ? 'border-blue-500 text-white' : 'border-transparent'}`}
           onClick={() => setActiveTabId(environment, tab.id)}
         >
           {tab.shortName}
-        </button>
+        </Button>
       ))}
     </div>
   );

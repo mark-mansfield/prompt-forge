@@ -1,6 +1,7 @@
 import { Save, Play, Trash2, Sparkles, Target, MessageSquare, CircleX, Square } from 'lucide-react';
 import { useState } from 'react';
 
+import { Button } from '../ui/button';
 import { PromptEditorHeader } from './header';
 import type { DraftPrompt } from '../layout/types';
 
@@ -75,77 +76,89 @@ export const PromptEditor = ({
         </div>
         <div className="flex gap-2">
           {openSidebarButton}
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             aria-label="Test prompt"
             title="Test prompt"
             onClick={handleExecutePrompt}
             disabled={!instructions?.trim() || isLoading}
-            className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+            className="bg-slate-700 hover:bg-slate-600 text-white"
           >
             <Play className="w-3 h-3" />
             {isLoading ? 'Testing...' : 'Run'}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
             aria-label="Stop"
             title="Stop"
             onClick={handleStop}
             disabled={!isLoading}
-            className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+            className="bg-slate-700 hover:bg-slate-600 text-white"
           >
             <Square className="w-3 h-3" />
             Stop
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
             aria-label="Clear prompt"
             title="Clear prompt"
             onClick={handleClear}
-            className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm flex items-center gap-1"
+            className="bg-slate-700 hover:bg-slate-600 text-white"
           >
             <CircleX className="w-3 h-3" />
             Clear
-          </button>
+          </Button>
         </div>
       </div>
       <div className="flex gap-2 p-2 bg-white/5  mb-6">
-        <button
+        <Button
+          variant="outline"
+          size="sm"
           title="Clarity"
           onClick={() => announceModifier('clear')}
           aria-pressed={activeSet.has('clear')}
-          className={`px-4 py-2 rounded flex items-center gap-1 ${
+          className={
             activeSet.has('clear')
-              ? 'bg-blue-500/30 text-blue-200 ring-1 ring-blue-300/40'
-              : 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/30'
-          }`}
+              ? 'bg-blue-500/30 text-blue-200 ring-1 ring-blue-300/40 border-0 hover:bg-blue-500/30'
+              : 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border-0'
+          }
         >
           <Sparkles className="w-4 h-4" aria-hidden="true" />
           Clarity
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
           title="Quality"
           onClick={() => announceModifier('quality')}
           aria-pressed={activeSet.has('quality')}
-          className={`px-4 py-2 rounded flex items-center gap-1 ${
+          className={
             activeSet.has('quality')
-              ? 'bg-emerald-500/30 text-emerald-200 ring-1 ring-emerald-300/40'
-              : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30'
-          }`}
+              ? 'bg-emerald-500/30 text-emerald-200 ring-1 ring-emerald-300/40 border-0 hover:bg-emerald-500/30'
+              : 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 border-0'
+          }
         >
           <Target className="w-4 h-4" aria-hidden="true" />
           Quality
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
           title="Tone"
           onClick={() => announceModifier('tone')}
           aria-pressed={activeSet.has('tone')}
-          className={`px-4 py-2 rounded flex items-center gap-1 ${
+          className={
             activeSet.has('tone')
-              ? 'bg-orange-500/30 text-orange-200 ring-1 ring-orange-300/40'
-              : 'bg-orange-500/20 text-orange-300 hover:bg-orange-500/30'
-          }`}
+              ? 'bg-orange-500/30 text-orange-200 ring-1 ring-orange-300/40 border-0 hover:bg-orange-500/30'
+              : 'bg-orange-500/20 text-orange-300 hover:bg-orange-500/30 border-0'
+          }
         >
           <MessageSquare className="w-4 h-4" aria-hidden="true" />
           Tone
-        </button>
+        </Button>
       </div>
       <input
         type="text"
@@ -164,23 +177,24 @@ export const PromptEditor = ({
         />
 
         <div className="w-full flex gap-2 justify-end">
-          <button
+          <Button
             disabled={!canSave}
             onClick={handleSave}
-            className="disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded flex items-center gap-1 shadow-lg"
+            className="bg-teal-600 hover:bg-teal-500 text-white shadow-lg"
           >
             <Save className="w-4 h-4" />
             Save
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="destructive"
             disabled={!canDelete}
             onClick={handleDelete}
             aria-label="Delete prompt"
             title="Delete prompt"
-            className="disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded flex items-center gap-1 shadow-lg"
+            className="bg-red-600 hover:bg-red-500"
           >
             <Trash2 className="w-4 h-4" aria-hidden="true" />
-          </button>
+          </Button>
         </div>
       </div>
     </section>

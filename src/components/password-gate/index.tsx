@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { Button } from '../ui/button';
+
 interface PasswordGateProps {
   onAuthorize: () => void;
 }
@@ -54,37 +56,25 @@ export function PasswordGate({ onAuthorize }: PasswordGateProps) {
               disabled={loading}
               className="w-full pr-20 pl-4 py-3 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-400 focus:outline-none focus:border-slate-500"
             />
-            <button
+            <Button
+              variant="ghost"
+              size="xs"
+              type="button"
               aria-label="Toggle password visibility"
               title={showPasscode ? 'Hide password' : 'Show password'}
               aria-pressed={showPasscode}
-              type="button"
               onClick={() => setShowPasscode((v) => !v)}
               disabled={loading}
-              className={[
-                'absolute right-2 top-1/2 -translate-y-1/2 text-sm px-2 py-1 rounded',
-                loading
-                  ? 'cursor-not-allowed opacity-60 text-slate-300'
-                  : 'text-slate-200 hover:text-white',
-              ].join(' ')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-200 hover:text-white"
             >
               {showPasscode ? 'Hide' : 'Show'}
-            </button>
+            </Button>
           </div>
           {error && <p className="text-red-400 text-sm">{error}</p>}
           <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={!canSubmit}
-              className={[
-                'px-6 py-2 text-white rounded transition-colors',
-                canSubmit
-                  ? 'bg-slate-600 hover:bg-slate-500 cursor-pointer'
-                  : 'bg-slate-700 cursor-not-allowed opacity-60',
-              ].join(' ')}
-            >
+            <Button type="submit" disabled={!canSubmit} className="bg-slate-600 hover:bg-slate-500">
               {loading ? 'Checking…' : 'Enter'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

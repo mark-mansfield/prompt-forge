@@ -1,7 +1,15 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { History } from 'lucide-react';
+import { ChevronDown, History } from 'lucide-react';
 import { ModelResponse } from '../model-response';
 import { WinnerButton } from '../winner-button';
+import { Button } from '../ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 import { PromptEditor } from '../prompt-editor';
 import type { Prompt } from './types';
 import { parseJsonEventStream, readUIMessageStream, uiMessageChunkSchema } from 'ai';
@@ -606,16 +614,18 @@ export function Layout() {
 
   const openSidebarButton = useMemo(() => {
     return (
-      <button
+      <Button
         type="button"
+        variant="secondary"
+        size="sm"
         aria-label="Open sidebar"
         title={hasPrompts ? 'Open sidebar' : 'No prompts yet'}
         onClick={openSidebar}
         disabled={!hasPrompts}
-        className="md:hidden px-3 py-1.5 rounded text-sm flex items-center bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-800"
+        className="md:hidden bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:hover:bg-slate-800"
       >
         <History className="w-4 h-4" aria-hidden="true" />
-      </button>
+      </Button>
     );
   }, [hasPrompts, openSidebar]);
 
@@ -664,40 +674,55 @@ export function Layout() {
 
             const googleDropdown =
               provider === 'google' ? (
-                <select
-                  className="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-slate-200"
-                  value={googleSelectedModelId}
-                  onChange={(e) => {
-                    const next = e.target.value;
-                    setGoogleSelectedModelId(next);
-                    // Clear the existing Google pane response so it's obvious it needs re-run.
-                    setModelResponses((prev) =>
-                      prev.map((mr) => {
-                        const mrProvider =
-                          normalizeModelId(mr.model_id) === 'llama-3.1-8b-instant'
-                            ? 'groq'
-                            : 'google';
-                        if (mrProvider !== 'google') return mr;
-                        return {
-                          ...mr,
-                          model_id: next,
-                          status: 'idle',
-                          error: undefined,
-                          usage: undefined,
-                          response: '',
-                        };
-                      })
-                    );
-                  }}
-                  disabled={r.status === 'streaming'}
-                  title={googleSelectedModelId}
-                >
-                  {googleModelOptions.map((opt) => (
-                    <option key={opt.id} value={opt.id}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="xs"
+                      disabled={r.status === 'streaming'}
+                      title={googleSelectedModelId}
+                      className="rounded-xs h-5 min-w-28 justify-between gap-1 bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700 hover:text-slate-100"
+                    >
+                      {googleModelOptions.find((o) => o.id === googleSelectedModelId)?.label ??
+                        googleSelectedModelId}
+                      <ChevronDown className="size-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    className="rounded-xs min-w-32 bg-slate-800 border-slate-700"
+                  >
+                    <DropdownMenuRadioGroup
+                      value={googleSelectedModelId}
+                      onValueChange={(next: string) => {
+                        setGoogleSelectedModelId(next);
+                        setModelResponses((prev) =>
+                          prev.map((mr) => {
+                            const mrProvider =
+                              normalizeModelId(mr.model_id) === 'llama-3.1-8b-instant'
+                                ? 'groq'
+                                : 'google';
+                            if (mrProvider !== 'google') return mr;
+                            return {
+                              ...mr,
+                              model_id: next,
+                              status: 'idle',
+                              error: undefined,
+                              usage: undefined,
+                              response: '',
+                            };
+                          })
+                        );
+                      }}
+                    >
+                      {googleModelOptions.map((opt) => (
+                        <DropdownMenuRadioItem className="rounded-xs" key={opt.id} value={opt.id}>
+                          {opt.label}
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : null;
             return (
               <ModelResponse
