@@ -1,4 +1,6 @@
+import { Info } from 'lucide-react';
 import { Button } from '../ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 export const ModelResponse = ({
   response,
@@ -59,7 +61,28 @@ export const ModelResponse = ({
               </h3>
               {headerInline ? <div className="shrink-0">{headerInline}</div> : null}
             </div>
-            <div className="pl-4 h-3 text-xs text-slate-400">{tokenLine || ''}</div>
+            <div className="pl-4 flex items-center gap-1">
+              {tokenLine ? (
+                <>
+                  <span className="text-xs text-slate-400">{tokenLine}</span>
+                  <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span
+                          className="inline-flex shrink-0 cursor-default text-slate-400"
+                          aria-label="Token count note"
+                        >
+                          <Info className="size-3.5" aria-hidden />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="max-w-[240px]">
+                        Token count from the AI service; may not match other tools (e.g. OpenAI’s).
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </>
+              ) : null}
+            </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {status === 'streaming' && onAbort ? (

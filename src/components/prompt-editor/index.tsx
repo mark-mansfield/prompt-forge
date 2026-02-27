@@ -173,7 +173,7 @@ export const PromptEditor = ({
           rows={6}
           value={instructions || ''}
           onChange={(e) => setInstructions(e.target.value)}
-          className="flex-1 w-full p-3 bg-slate-800 border border-slate-700 rounded text-white placeholder-slate-500 resize-none focus:outline-none focus:border-slate-600"
+          className="flex-1 min-h-32 w-full p-3 bg-slate-800 border border-slate-700 rounded text-white placeholder-slate-500 resize-y focus:outline-none focus:border-slate-600"
         />
 
         <div className="w-full flex gap-2 justify-end">

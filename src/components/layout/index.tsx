@@ -663,7 +663,7 @@ export function Layout() {
         />
 
         {/* Model Responses - Side by Side */}
-        <section className="grid grid-cols-2 items-stretch flex-1">
+        <section className="grid min-h-0 grid-cols-2 items-stretch flex-1 overflow-auto">
           {modelResponses.map((r, idx) => {
             const modelId = normalizeModelId(r.model_id);
             const key = `${modelId}-${r.created_at ?? idx}`;
