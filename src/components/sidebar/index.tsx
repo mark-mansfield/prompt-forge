@@ -104,18 +104,21 @@ export function Sidebar({ promptNodesRef, handleLoadPrompt }: Props) {
               className="w-full pl-8 pr-9 py-2 rounded-md bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-slate-600 text-sm"
               aria-label="Search prompts"
             />
-            {searchQuery.trim() !== '' && (
+            <span
+              className={`absolute right-1.5 top-1/2 -translate-y-1/2 ${searchQuery.trim() === '' ? 'opacity-0 pointer-events-none' : ''}`}
+              aria-hidden={searchQuery.trim() === ''}
+            >
               <Button
                 type="button"
                 variant="ghost"
                 size="icon-sm"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 h-7 w-7 text-slate-400 hover:text-white hover:bg-slate-700"
+                className="h-7 w-7 text-slate-400 hover:text-white hover:bg-slate-700"
                 aria-label="Clear search"
                 onClick={clearSearch}
               >
                 <X className="h-4 w-4" />
               </Button>
-            )}
+            </span>
           </div>
         </div>
       </div>
